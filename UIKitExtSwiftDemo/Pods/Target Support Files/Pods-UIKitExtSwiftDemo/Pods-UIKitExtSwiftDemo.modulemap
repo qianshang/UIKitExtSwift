@@ -1,6 +1,0 @@
-framework module Pods_UIKitExtSwiftDemo {
-  umbrella header "Pods-UIKitExtSwiftDemo-umbrella.h"
-
-  export *
-  module * { export * }
-}
