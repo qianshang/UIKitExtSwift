@@ -1,0 +1,16 @@
+PODS:
+  - UIKitExtSwift (0.0.1)
+
+DEPENDENCIES:
+  - UIKitExtSwift (from `../`)
+
+EXTERNAL SOURCES:
+  UIKitExtSwift:
+    :path: ../
+
+SPEC CHECKSUMS:
+  UIKitExtSwift: c744d844cf552bfd18464e1e3c6d73e4dcca504d
+
+PODFILE CHECKSUM: ac21dc899edb9e2d4c7eaeb1483db537996a0be6
+
+COCOAPODS: 1.4.0.beta.1

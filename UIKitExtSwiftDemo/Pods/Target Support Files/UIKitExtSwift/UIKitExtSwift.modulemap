@@ -1,0 +1,6 @@
+framework module UIKitExtSwift {
+  umbrella header "UIKitExtSwift-umbrella.h"
+
+  export *
+  module * { export * }
+}
