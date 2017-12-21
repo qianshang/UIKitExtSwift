@@ -22,11 +22,14 @@ class ViewController: UIViewController {
         self.view.addSubview(imageView)
         imageView.center = CGPoint(x: 60, y: 70)
         imageView.isCouldPreview = true
+        imageView.groupId = 0
         imageView.touchAreaInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
         
         let img1 = UIImage.linerGradient(colors: colors, size: size)
         let imageView1 = UIImageView(image: img1)
         self.view.addSubview(imageView1)
+        imageView1.isCouldPreview = true
+        imageView1.groupId = 0
         imageView1.origin = CGPoint(x: imageView.x, y: imageView.maxY)
     }
 

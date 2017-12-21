@@ -7,6 +7,8 @@
 
 import Foundation
 import UIKit
+import ImageIO
+import Accelerate
 
 extension UIImage {
     public typealias Drawer = (CGContext?) -> Void
@@ -263,6 +265,176 @@ extension UIImage {
         } ?? UIImage()
     }
     
+}
+
+extension UIImage {
+    /*
+    func blur(radius: CGFloat,
+              tintColor: UIColor,
+              tintMode: CGBlendMode,
+              saturation: CGFloat,
+              maskImage: UIImage? = nil) -> UIImage {
+        guard self.size.width >= 1,
+            self.size.height >= 1,
+            let imageRef = self.cgImage else {
+                return self
+        }
+        if let mask = maskImage, let _ = mask.cgImage {
+            return self
+        }
+        
+        let hasBlur = radius > CGFloat(Float.ulpOfOne)
+        let hasSaturation = fabs(saturation - 1.0) > CGFloat(Float.ulpOfOne)
+        let size = self.size
+        let rect = CGRect(origin: .zero, size: size)
+        let scale = self.scale
+        let opaque = false
+        
+        if (!hasBlur && !hasSaturation) {
+            return [self _yy_mergeImageRef:imageRef tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
+        }
+        
+        vImage_Buffer effect = { 0 }, scratch = { 0 };
+        vImage_Buffer *input = NULL, *output = NULL;
+        
+        vImage_CGImageFormat format = {
+            .bitsPerComponent = 8,
+            .bitsPerPixel = 32,
+            .colorSpace = NULL,
+            .bitmapInfo = kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little, //requests a BGRA buffer.
+            .version = 0,
+            .decode = NULL,
+            .renderingIntent = kCGRenderingIntentDefault
+        };
+        
+        if (hasNewFunc) {
+            vImage_Error err;
+            err = vImageBuffer_InitWithCGImage(&effect, &format, NULL, imageRef, kvImagePrintDiagnosticsToConsole);
+            if (err != kvImageNoError) {
+                NSLog(@"UIImage+YYAdd error: vImageBuffer_InitWithCGImage returned error code %zi for inputImage: %@", err, self);
+                return nil;
+            }
+            err = vImageBuffer_Init(&scratch, effect.height, effect.width, format.bitsPerPixel, kvImageNoFlags);
+            if (err != kvImageNoError) {
+                NSLog(@"UIImage+YYAdd error: vImageBuffer_Init returned error code %zi for inputImage: %@", err, self);
+                return nil;
+            }
+        } else {
+            UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+            CGContextRef effectCtx = UIGraphicsGetCurrentContext();
+            CGContextScaleCTM(effectCtx, 1.0, -1.0);
+            CGContextTranslateCTM(effectCtx, 0, -size.height);
+            CGContextDrawImage(effectCtx, rect, imageRef);
+            effect.data     = CGBitmapContextGetData(effectCtx);
+            effect.width    = CGBitmapContextGetWidth(effectCtx);
+            effect.height   = CGBitmapContextGetHeight(effectCtx);
+            effect.rowBytes = CGBitmapContextGetBytesPerRow(effectCtx);
+            
+            UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+            CGContextRef scratchCtx = UIGraphicsGetCurrentContext();
+            scratch.data     = CGBitmapContextGetData(scratchCtx);
+            scratch.width    = CGBitmapContextGetWidth(scratchCtx);
+            scratch.height   = CGBitmapContextGetHeight(scratchCtx);
+            scratch.rowBytes = CGBitmapContextGetBytesPerRow(scratchCtx);
+        }
+        
+        input = &effect;
+        output = &scratch;
+        
+        if (hasBlur) {
+            // A description of how to compute the box kernel width from the Gaussian
+            // radius (aka standard deviation) appears in the SVG spec:
+            // http://www.w3.org/TR/SVG/filters.html#feGaussianBlurElement
+            //
+            // For larger values of 's' (s >= 2.0), an approximation can be used: Three
+            // successive box-blurs build a piece-wise quadratic convolution kernel, which
+            // approximates the Gaussian kernel to within roughly 3%.
+            //
+            // let d = floor(s * 3*sqrt(2*pi)/4 + 0.5)
+            //
+            // ... if d is odd, use three box-blurs of size 'd', centered on the output pixel.
+            //
+            CGFloat inputRadius = blurRadius * scale;
+            if (inputRadius - 2.0 < __FLT_EPSILON__) inputRadius = 2.0;
+            uint32_t radius = floor((inputRadius * 3.0 * sqrt(2 * M_PI) / 4 + 0.5) / 2);
+            radius |= 1; // force radius to be odd so that the three box-blur methodology works.
+            int iterations;
+            if (blurRadius * scale < 0.5) iterations = 1;
+            else if (blurRadius * scale < 1.5) iterations = 2;
+            else iterations = 3;
+            NSInteger tempSize = vImageBoxConvolve_ARGB8888(input, output, NULL, 0, 0, radius, radius, NULL, kvImageGetTempBufferSize | kvImageEdgeExtend);
+            void *temp = malloc(tempSize);
+            for (int i = 0; i < iterations; i++) {
+                vImageBoxConvolve_ARGB8888(input, output, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
+                YY_SWAP(input, output);
+            }
+            free(temp);
+        }
+        
+        
+        if (hasSaturation) {
+            // These values appear in the W3C Filter Effects spec:
+            // https://dvcs.w3.org/hg/FXTF/raw-file/default/filters/Publish.html#grayscaleEquivalent
+            CGFloat s = saturation;
+            CGFloat matrixFloat[] = {
+                0.0722 + 0.9278 * s,  0.0722 - 0.0722 * s,  0.0722 - 0.0722 * s,  0,
+                0.7152 - 0.7152 * s,  0.7152 + 0.2848 * s,  0.7152 - 0.7152 * s,  0,
+                0.2126 - 0.2126 * s,  0.2126 - 0.2126 * s,  0.2126 + 0.7873 * s,  0,
+                0,                    0,                    0,                    1,
+            };
+            const int32_t divisor = 256;
+            NSUInteger matrixSize = sizeof(matrixFloat) / sizeof(matrixFloat[0]);
+            int16_t matrix[matrixSize];
+            for (NSUInteger i = 0; i < matrixSize; ++i) {
+                matrix[i] = (int16_t)roundf(matrixFloat[i] * divisor);
+            }
+            vImageMatrixMultiply_ARGB8888(input, output, matrix, divisor, NULL, NULL, kvImageNoFlags);
+            YY_SWAP(input, output);
+        }
+        
+        UIImage *outputImage = nil;
+        if (hasNewFunc) {
+            CGImageRef effectCGImage = NULL;
+            effectCGImage = vImageCreateCGImageFromBuffer(input, &format, &_yy_cleanupBuffer, NULL, kvImageNoAllocate, NULL);
+            if (effectCGImage == NULL) {
+                effectCGImage = vImageCreateCGImageFromBuffer(input, &format, NULL, NULL, kvImageNoFlags, NULL);
+                free(input->data);
+            }
+            free(output->data);
+            outputImage = [self _yy_mergeImageRef:effectCGImage tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
+            CGImageRelease(effectCGImage);
+        } else {
+            CGImageRef effectCGImage;
+            UIImage *effectImage;
+            if (input != &effect) effectImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            if (input == &effect) effectImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            effectCGImage = effectImage.CGImage;
+            outputImage = [self _yy_mergeImageRef:effectCGImage tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
+        }
+        return outputImage;
+        
+    }
+    
+    func merge(imageRef: CGImage,
+               tintColor: UIColor? = nil,
+               tintBlendMode: CGBlendMode,
+               maskImage: UIImage? = nil,
+               opaque: Bool = false) -> UIImage {
+        guard tintColor == nil, maskImage == nil else {
+            return UIImage(cgImage: imageRef)
+        }
+        let size = self.size
+        let rect = CGRect(origin: .zero, size: size)
+        let scale = self.scale
+        
+        return self.draw { context in
+            context?.ctm = CGAffineTransform(scaleX: 1.0, y: -1.0)
+            
+        }
+    }
+    */
 }
 
 

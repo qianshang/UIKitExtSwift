@@ -65,7 +65,9 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
     var scrollView: UIScrollView!
     var cells: [PhotoGroupCell] = []
     var imageViews: [UIImageView]!
-    var currentIndex: Int = 0
+    var totalPage: Int = 0
+    var currentPage: Int = 0
+    private var snapshotImage: UIImage?
     
     static func show(_ imageView: UIImageView) {
         guard let image = imageView.image else {
@@ -74,6 +76,7 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
         let view = PhotoGroupView(frame: UIScreen.main.bounds)
         
         let container = currentViewController().view
+        view.snapshotImage = container?.snapshot()
         container?.addSubview(view)
         
         if let id = imageView.groupId {
@@ -85,8 +88,9 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
                         ($0 as! UIImageView).isCouldPreview &&
                         ($0 as! UIImageView).groupId == id
                 }) as! [UIImageView]
+            view.totalPage = images.count
             // 如果只有一个则直接预览
-            guard images.count > 1 else {
+            guard view.totalPage > 1 else {
                 return view.previewOne(image)
             }
             // 配置
@@ -140,10 +144,18 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
     }
     func setupUI() {
         contentView = UIView(frame: self.bounds)
-        contentView.backgroundColor = UIColor(0x000000, 0.3)
+        if let img = snapshotImage {
+            
+        }
+//        contentView.backgroundColor = UIColor(0x000000, 0.3)
         
-        scrollView = UIScrollView(frame: CGRect(x: -10, y: 0, width: self.width+20, height: self.height))
+//        let effect = UIBlurEffect(style: .dark)
+//        let effectView = UIVisualEffectView(effect: effect)
+//        self.insertSubview(effectView, at: 0)
+        
+        scrollView = UIScrollView(frame: CGRect(x: -10, y: 0, width: self.width + 20, height: self.height))
         scrollView.delegate = self
+        scrollView.isPagingEnabled = true
         self.addSubview(contentView)
         self.addSubview(scrollView)
         
@@ -162,12 +174,23 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
         self.addGestureRecognizer(pan)
     }
     
-    // MARK: - 手势处理
+    // MARK: 手势处理
     @objc func dismiss(_ sender: UITapGestureRecognizer) {
         self.removeFromSuperview()
     }
     @objc func doubleTap(_ sender: UITapGestureRecognizer) {
-        
+        if let cell = cell(currentPage) {
+            if (cell.zoomScale > 1) {
+                cell.setZoomScale(1, animated: true)
+            } else {
+                let point = sender.location(in: cell.imageView)
+                let scale = cell.maximumZoomScale
+                let xsize = self.width / scale
+                let ysize = self.height / scale
+                let rect = CGRect(x: point.x - xsize * 0.5, y: point.y - ysize * 0.5, width: xsize, height: ysize)
+                cell.zoom(to: rect, animated: true)
+            }
+        }
     }
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
         
@@ -180,6 +203,7 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
         updateCellsForReuse()
         
         let page: NSInteger = NSInteger(self.scrollView.contentOffset.x / self.scrollView.width + 0.5)
+        currentPage = page
         for i in max(page-1, 0)...min(page+1, imageViews.count-1) {
             if let cell = cell(i) {
                 cell.config(imageViews[i].image!)
