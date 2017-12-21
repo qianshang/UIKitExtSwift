@@ -224,6 +224,15 @@ extension UIImage {
         return try filter.outputImage?.bitmap(size: size)
     }
     
+    
+    /// 创建一个线性渐变图片
+    ///
+    /// - Parameters:
+    ///   - colors: 渐变色数组
+    ///   - size: 图片大小
+    ///   - startPoint: 开始位置
+    ///   - endPoint: 结束位置
+    /// - Returns: 渐变图片
     public static func linerGradient(colors: [UIColor],
                                      size: CGSize,
                                      startPoint: CGPoint? = nil,

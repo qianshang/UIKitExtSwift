@@ -126,3 +126,22 @@ extension UIView {
         }
     }
 }
+
+extension UIView {
+    private static let touchAreaInsetPointer = ObjectAssociation<UIEdgeInsets>()
+    
+    public var touchAreaInset: UIEdgeInsets {
+        set { UIView.touchAreaInsetPointer[self] = newValue }
+        get { return UIView.touchAreaInsetPointer[self] ?? .zero }
+    }
+    
+    
+    
+//    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+//        let inset = self.touchAreaInset
+//        let bounds = self.bounds
+//        let hitBounds = UIEdgeInsetsInsetRect(bounds, inset)
+//
+//        return hitBounds.contains(point)
+//    }
+}

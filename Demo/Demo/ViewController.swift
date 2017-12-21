@@ -20,7 +20,9 @@ class ViewController: UIViewController {
         let img = UIImage.init(color: .blue, size: size, storkColor: .red, storkWidth: 10, radius: 50)
         let imageView = UIImageView(image: img)
         self.view.addSubview(imageView)
-        imageView.center = CGPoint(x: 50, y: 70)
+        imageView.center = CGPoint(x: 60, y: 70)
+        imageView.isCouldPreview = true
+        imageView.touchAreaInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
         
         let img1 = UIImage.linerGradient(colors: colors, size: size)
         let imageView1 = UIImageView(image: img1)
