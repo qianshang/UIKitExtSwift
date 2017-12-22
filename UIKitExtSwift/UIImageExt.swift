@@ -10,6 +10,8 @@ import UIKit
 import ImageIO
 import Accelerate
 
+
+// MARK: - Draw
 extension UIImage {
     public typealias Drawer = (CGContext?) -> Void
     
@@ -38,16 +40,6 @@ extension UIImage {
 
 extension UIImage {
     
-    /// 创建一个纯色图片
-    ///
-    /// - Parameters:
-    ///   - color: 填充色
-    ///   - size: 图片大小
-    ///   - storkColor: 边框颜色
-    ///   - storkWidth: 边框宽度
-    ///   - radius: 圆角大小
-    ///   - corners: 圆角位置
-    /// - Returns: 创建完成的图片
     public static func `init`(color: UIColor,
                               size: CGSize = CGSize(width: 1, height: 1),
                               storkColor: UIColor? = nil,
@@ -78,11 +70,6 @@ extension UIImage {
         }) ?? UIImage()
     }
     
-    
-    /// 缩放图片
-    ///
-    /// - Parameter size: 图片大小
-    /// - Returns: 缩放完成的图片
     public func resize(_ size: CGSize) -> UIImage {
         return self.draw { _ in
             self.draw(in: CGRect(origin: .zero, size: size))
@@ -196,9 +183,9 @@ extension UIImage {
         }
     }
     
-    public func blur(radius: CGFloat) -> UIImage {
+    public func gaussianBlur(radius: CGFloat) -> UIImage {
         do {
-            let result = try CIImage(image: self)?.blur(radius: radius)
+            let result = try CIImage(image: self)?.gaussianBlur(radius: radius)
             return result ?? self
         } catch {
             return self
@@ -226,15 +213,6 @@ extension UIImage {
         return try filter.outputImage?.bitmap(size: size)
     }
     
-    
-    /// 创建一个线性渐变图片
-    ///
-    /// - Parameters:
-    ///   - colors: 渐变色数组
-    ///   - size: 图片大小
-    ///   - startPoint: 开始位置
-    ///   - endPoint: 结束位置
-    /// - Returns: 渐变图片
     public static func linerGradient(colors: [UIColor],
                                      size: CGSize,
                                      startPoint: CGPoint? = nil,
@@ -262,184 +240,166 @@ extension UIImage {
             context?.drawLinearGradient(gradient!, start: startPoint, end: endPoint, options: .drawsAfterEndLocation)
             
             context?.restoreGState()
-        } ?? UIImage()
+            } ?? UIImage()
     }
     
+}
+
+
+// MARK: - UIImage Color
+// from BCColor
+// https://github.com/boycechang/BCColor/tree/master/BCColor/BCColor
+public struct ImageColors {
+    /// The background color.
+    public var backgroundColor: UIColor!
+    
+    /// The primary color.
+    public var primaryColor: UIColor!
+    
+    /// The secondary color.
+    public var secondaryColor: UIColor!
+    
+    /// The minor color.
+    public var minorColor: UIColor!
+}
+
+private class CountedColor {
+    let color: UIColor
+    let count: Int
+    
+    init(color: UIColor, count: Int) {
+        self.color = color
+        self.count = count
+    }
 }
 
 extension UIImage {
-    /*
-    func blur(radius: CGFloat,
-              tintColor: UIColor,
-              tintMode: CGBlendMode,
-              saturation: CGFloat,
-              maskImage: UIImage? = nil) -> UIImage {
-        guard self.size.width >= 1,
-            self.size.height >= 1,
-            let imageRef = self.cgImage else {
-                return self
-        }
-        if let mask = maskImage, let _ = mask.cgImage {
-            return self
-        }
+    public var colors: ImageColors {
         
-        let hasBlur = radius > CGFloat(Float.ulpOfOne)
-        let hasSaturation = fabs(saturation - 1.0) > CGFloat(Float.ulpOfOne)
-        let size = self.size
-        let rect = CGRect(origin: .zero, size: size)
-        let scale = self.scale
-        let opaque = false
+        var result = ImageColors()
         
-        if (!hasBlur && !hasSaturation) {
-            return [self _yy_mergeImageRef:imageRef tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
-        }
+        // get the ratio of width to height
+        let ratio = self.size.width/self.size.height
         
-        vImage_Buffer effect = { 0 }, scratch = { 0 };
-        vImage_Buffer *input = NULL, *output = NULL;
+        // calculate new r_width and r_height
+        let r_width: CGFloat = 100
+        let r_height: CGFloat = r_width/ratio
         
-        vImage_CGImageFormat format = {
-            .bitsPerComponent = 8,
-            .bitsPerPixel = 32,
-            .colorSpace = NULL,
-            .bitmapInfo = kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little, //requests a BGRA buffer.
-            .version = 0,
-            .decode = NULL,
-            .renderingIntent = kCGRenderingIntentDefault
-        };
+        // resize the image to the new r_width and r_height
+        let cgImage = self.resize(CGSize(width: r_width, height: r_height)).cgImage
         
-        if (hasNewFunc) {
-            vImage_Error err;
-            err = vImageBuffer_InitWithCGImage(&effect, &format, NULL, imageRef, kvImagePrintDiagnosticsToConsole);
-            if (err != kvImageNoError) {
-                NSLog(@"UIImage+YYAdd error: vImageBuffer_InitWithCGImage returned error code %zi for inputImage: %@", err, self);
-                return nil;
+        // get the width and height of the new image
+        let width = cgImage?.width
+        let height = cgImage?.height
+        
+        // get the colors from the image
+        let bytesPerPixel: Int = 4
+        let bytesPerRow: Int = width! * bytesPerPixel
+        let bitsPerComponent: Int = 8
+        let sortedColorComparator: Comparator = { (main, other) -> ComparisonResult in
+            let m = main as! CountedColor, o = other as! CountedColor
+            if m.count < o.count {
+                return ComparisonResult.orderedDescending
+            } else if m.count == o.count {
+                return ComparisonResult.orderedSame
+            } else {
+                return ComparisonResult.orderedAscending
             }
-            err = vImageBuffer_Init(&scratch, effect.height, effect.width, format.bitsPerPixel, kvImageNoFlags);
-            if (err != kvImageNoError) {
-                NSLog(@"UIImage+YYAdd error: vImageBuffer_Init returned error code %zi for inputImage: %@", err, self);
-                return nil;
+        }
+        
+        // get black and white colors
+        let blackColor = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        let whiteColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        
+        // color detection
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let raw = malloc(bytesPerRow * height!)
+        let bitmapInfo = CGImageAlphaInfo.premultipliedFirst.rawValue
+        let ctx = CGContext(data: raw, width: width!, height: height!, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo)
+        ctx?.draw(cgImage!, in: CGRect(x: 0, y: 0, width: CGFloat(width!), height: CGFloat(height!)))
+        
+        let data =  ctx?.data
+        let imageColors = NSCountedSet(capacity: width! * height!)
+        
+        // color detection
+        for x in 0..<width! {
+            for y in 0..<height! {
+                let pixel = ((width! * y) + x) * bytesPerPixel
+                let color = UIColor(
+                    red: round(CGFloat(data!.load(fromByteOffset: pixel + 1, as: UInt8.self)) / 255 * 120) / 120,
+                    green: round(CGFloat(data!.load(fromByteOffset: pixel + 2, as: UInt8.self)) / 255 * 120) / 120,
+                    blue: round(CGFloat(data!.load(fromByteOffset: pixel + 3, as: UInt8.self)) / 255 * 120) / 120,
+                    alpha: 1
+                )
+                
+                imageColors.add(color)
             }
+        }
+        free(raw)
+        
+        // preprocess and filter colors that appear seldomly or close to black or white
+        let enumerator = imageColors.objectEnumerator()
+        let sortedColors = NSMutableArray(capacity: imageColors.count)
+        while let kolor = enumerator.nextObject() as? UIColor {
+            let colorCount = imageColors.count(for: kolor)
+            if 3 < colorCount && !kolor.isBlackOrWhite {
+                sortedColors.add(CountedColor(color: kolor, count: colorCount))
+            }
+        }
+        sortedColors.sort(comparator: sortedColorComparator)
+        
+        // get the background colour
+        var backgroundColor: CountedColor
+        if 0 < sortedColors.count {
+            backgroundColor = sortedColors.object(at: 0) as! CountedColor
         } else {
-            UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
-            CGContextRef effectCtx = UIGraphicsGetCurrentContext();
-            CGContextScaleCTM(effectCtx, 1.0, -1.0);
-            CGContextTranslateCTM(effectCtx, 0, -size.height);
-            CGContextDrawImage(effectCtx, rect, imageRef);
-            effect.data     = CGBitmapContextGetData(effectCtx);
-            effect.width    = CGBitmapContextGetWidth(effectCtx);
-            effect.height   = CGBitmapContextGetHeight(effectCtx);
-            effect.rowBytes = CGBitmapContextGetBytesPerRow(effectCtx);
+            backgroundColor = CountedColor(color: blackColor, count: 1)
+        }
+        result.backgroundColor = backgroundColor.color
+        
+        // create theme colors, contrast theme color with background color in lightness, and select cognizable chromatic aberration among theme colors
+        let isDarkBackgound = result.backgroundColor.isDark
+        for curContainer in sortedColors {
+            let kolor = (curContainer as! CountedColor).color
+            if (kolor.isDark && isDarkBackgound) || (!kolor.isDark && !isDarkBackgound) {continue}
             
-            UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
-            CGContextRef scratchCtx = UIGraphicsGetCurrentContext();
-            scratch.data     = CGBitmapContextGetData(scratchCtx);
-            scratch.width    = CGBitmapContextGetWidth(scratchCtx);
-            scratch.height   = CGBitmapContextGetHeight(scratchCtx);
-            scratch.rowBytes = CGBitmapContextGetBytesPerRow(scratchCtx);
-        }
-        
-        input = &effect;
-        output = &scratch;
-        
-        if (hasBlur) {
-            // A description of how to compute the box kernel width from the Gaussian
-            // radius (aka standard deviation) appears in the SVG spec:
-            // http://www.w3.org/TR/SVG/filters.html#feGaussianBlurElement
-            //
-            // For larger values of 's' (s >= 2.0), an approximation can be used: Three
-            // successive box-blurs build a piece-wise quadratic convolution kernel, which
-            // approximates the Gaussian kernel to within roughly 3%.
-            //
-            // let d = floor(s * 3*sqrt(2*pi)/4 + 0.5)
-            //
-            // ... if d is odd, use three box-blurs of size 'd', centered on the output pixel.
-            //
-            CGFloat inputRadius = blurRadius * scale;
-            if (inputRadius - 2.0 < __FLT_EPSILON__) inputRadius = 2.0;
-            uint32_t radius = floor((inputRadius * 3.0 * sqrt(2 * M_PI) / 4 + 0.5) / 2);
-            radius |= 1; // force radius to be odd so that the three box-blur methodology works.
-            int iterations;
-            if (blurRadius * scale < 0.5) iterations = 1;
-            else if (blurRadius * scale < 1.5) iterations = 2;
-            else iterations = 3;
-            NSInteger tempSize = vImageBoxConvolve_ARGB8888(input, output, NULL, 0, 0, radius, radius, NULL, kvImageGetTempBufferSize | kvImageEdgeExtend);
-            void *temp = malloc(tempSize);
-            for (int i = 0; i < iterations; i++) {
-                vImageBoxConvolve_ARGB8888(input, output, temp, 0, 0, radius, radius, NULL, kvImageEdgeExtend);
-                YY_SWAP(input, output);
+            if result.primaryColor == nil {
+                if kolor.isContrasting(result.backgroundColor) {
+                    result.primaryColor = kolor
+                }
+            } else if result.secondaryColor == nil {
+                if result.primaryColor.isDistinct(kolor) && kolor.isContrasting(result.backgroundColor) {
+                    result.secondaryColor = kolor
+                }
+            } else if result.minorColor == nil {
+                if result.secondaryColor.isDistinct(kolor) && result.primaryColor.isDistinct(kolor) && kolor.isContrasting(result.backgroundColor) {
+                    result.minorColor = kolor
+                    break
+                }
             }
-            free(temp);
         }
         
         
-        if (hasSaturation) {
-            // These values appear in the W3C Filter Effects spec:
-            // https://dvcs.w3.org/hg/FXTF/raw-file/default/filters/Publish.html#grayscaleEquivalent
-            CGFloat s = saturation;
-            CGFloat matrixFloat[] = {
-                0.0722 + 0.9278 * s,  0.0722 - 0.0722 * s,  0.0722 - 0.0722 * s,  0,
-                0.7152 - 0.7152 * s,  0.7152 + 0.2848 * s,  0.7152 - 0.7152 * s,  0,
-                0.2126 - 0.2126 * s,  0.2126 - 0.2126 * s,  0.2126 + 0.7873 * s,  0,
-                0,                    0,                    0,                    1,
-            };
-            const int32_t divisor = 256;
-            NSUInteger matrixSize = sizeof(matrixFloat) / sizeof(matrixFloat[0]);
-            int16_t matrix[matrixSize];
-            for (NSUInteger i = 0; i < matrixSize; ++i) {
-                matrix[i] = (int16_t)roundf(matrixFloat[i] * divisor);
-            }
-            vImageMatrixMultiply_ARGB8888(input, output, matrix, divisor, NULL, NULL, kvImageNoFlags);
-            YY_SWAP(input, output);
+        if result.primaryColor == nil {
+            result.primaryColor = isDarkBackgound ? whiteColor:blackColor
         }
         
-        UIImage *outputImage = nil;
-        if (hasNewFunc) {
-            CGImageRef effectCGImage = NULL;
-            effectCGImage = vImageCreateCGImageFromBuffer(input, &format, &_yy_cleanupBuffer, NULL, kvImageNoAllocate, NULL);
-            if (effectCGImage == NULL) {
-                effectCGImage = vImageCreateCGImageFromBuffer(input, &format, NULL, NULL, kvImageNoFlags, NULL);
-                free(input->data);
-            }
-            free(output->data);
-            outputImage = [self _yy_mergeImageRef:effectCGImage tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
-            CGImageRelease(effectCGImage);
-        } else {
-            CGImageRef effectCGImage;
-            UIImage *effectImage;
-            if (input != &effect) effectImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            if (input == &effect) effectImage = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            effectCGImage = effectImage.CGImage;
-            outputImage = [self _yy_mergeImageRef:effectCGImage tintColor:tintColor tintBlendMode:tintBlendMode maskImage:maskImage opaque:opaque];
+        if result.secondaryColor == nil {
+            result.secondaryColor = isDarkBackgound ? whiteColor:blackColor
         }
-        return outputImage;
         
+        if result.minorColor == nil {
+            result.minorColor = isDarkBackgound ? whiteColor:blackColor
+        }
+        
+        return result
     }
-    
-    func merge(imageRef: CGImage,
-               tintColor: UIColor? = nil,
-               tintBlendMode: CGBlendMode,
-               maskImage: UIImage? = nil,
-               opaque: Bool = false) -> UIImage {
-        guard tintColor == nil, maskImage == nil else {
-            return UIImage(cgImage: imageRef)
-        }
-        let size = self.size
-        let rect = CGRect(origin: .zero, size: size)
-        let scale = self.scale
-        
-        return self.draw { context in
-            context?.ctm = CGAffineTransform(scaleX: 1.0, y: -1.0)
-            
-        }
-    }
-    */
 }
 
 
+// MARK: - CIImage
 extension CIImage {
-    func blur(radius: CGFloat) throws -> UIImage? {
+    func gaussianBlur(radius: CGFloat) throws -> UIImage? {
         guard let filter = CIFilter(name: "CIGaussianBlur") else {
             throw NSError(domain: "Create filter failure", code: 1001, userInfo: nil)
         }

@@ -127,6 +127,31 @@ extension UIView {
     }
 }
 
+
+
+// MARK: change touch area for UIView
+private let swizzling: (UIView.Type) -> () = { view in
+    let originalSelector = #selector(view.point(inside:with:))
+    let swizzledSelector = #selector(view.uk_point(inside:with:))
+    
+    let originalMethod = class_getInstanceMethod(view, originalSelector)
+    let swizzledMethod = class_getInstanceMethod(view, swizzledSelector)
+    
+    method_exchangeImplementations(originalMethod!, swizzledMethod!)
+}
+
+extension UIApplication {
+    
+    private static let runOnce: Void = {
+        swizzling(UIView.self)
+    }()
+    
+    override open var next: UIResponder? {
+        UIApplication.runOnce
+        return super.next
+    }
+}
+
 extension UIView {
     private static let touchAreaInsetPointer = ObjectAssociation<UIEdgeInsets>()
     
@@ -135,13 +160,10 @@ extension UIView {
         get { return UIView.touchAreaInsetPointer[self] ?? .zero }
     }
     
-    
-    
-//    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-//        let inset = self.touchAreaInset
-//        let bounds = self.bounds
-//        let hitBounds = UIEdgeInsetsInsetRect(bounds, inset)
-//
-//        return hitBounds.contains(point)
-//    }
+    @objc func uk_point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let inset = self.touchAreaInset
+        let bounds = self.bounds
+        let hitBounds = UIEdgeInsetsInsetRect(bounds, inset)
+        return hitBounds.contains(point)
+    }
 }

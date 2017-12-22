@@ -61,23 +61,26 @@ func currentViewController() -> UIViewController {
 }
 
 class PhotoGroupView: UIView, UIScrollViewDelegate {
-    var contentView: UIView!
-    var scrollView: UIScrollView!
-    var cells: [PhotoGroupCell] = []
-    var imageViews: [UIImageView]!
+    private var contentView: UIView!
+    private var backgroundImageView: UIImageView!
+    private var scrollView: UIScrollView!
+    private var cells: [PhotoGroupCell] = []
+    private var imageViews: [UIImageView]!
+    private var snapshotImage: UIImage? {
+        didSet {
+            DispatchQueue.main.async {
+                self.backgroundImageView.image = self.snapshotImage
+            }
+        }
+    }
     var totalPage: Int = 0
     var currentPage: Int = 0
-    private var snapshotImage: UIImage?
     
     static func show(_ imageView: UIImageView) {
         guard let image = imageView.image else {
             return
         }
         let view = PhotoGroupView(frame: UIScreen.main.bounds)
-        
-        let container = currentViewController().view
-        view.snapshotImage = container?.snapshot()
-        container?.addSubview(view)
         
         if let id = imageView.groupId {
             // 找出同层级可预览的imageview
@@ -90,33 +93,43 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
                 }) as! [UIImageView]
             view.totalPage = images.count
             // 如果只有一个则直接预览
-            guard view.totalPage > 1 else {
-                return view.previewOne(image)
-            }
-            // 配置
-            if let idx = imageView.index {
-                // 按照index进行排序
-                let imgs = images.sorted(by: { $0.index! < $1.index! })
-                view.config(imgs, index: idx)
+            if view.totalPage <= 1 {
+                view.previewOne(image)
             } else {
-                // 按照位置进行排序
-                let imgs = images.sorted(by: {(imageView1, imageView2) in
-                    (imageView1.y == imageView2.y) ?(imageView1.x < imageView2.x):(imageView1.y < imageView2.y)
-                })
-                // 找出当前选中imageview的位置
-                var idx = 0
-                while (imageView != imgs[idx]) {
-                    idx += 1
+                // 配置
+                if let idx = imageView.index {
+                    // 按照index进行排序
+                    let imgs = images.sorted(by: { $0.index! < $1.index! })
+                    view.config(imgs, index: idx)
+                } else {
+                    // 按照位置进行排序
+                    let imgs = images.sorted(by: {(imageView1, imageView2) in
+                        (imageView1.y == imageView2.y) ?(imageView1.x < imageView2.x):(imageView1.y < imageView2.y)
+                    })
+                    // 找出当前选中imageview的位置
+                    var idx = 0
+                    while (imageView != imgs[idx]) {
+                        idx += 1
+                    }
+                    view.config(imgs, index: idx)
                 }
-                view.config(imgs, index: idx)
             }
         } else {
             view.previewOne(image)
         }
+        
+        let container = currentViewController().view
+        view.snapshotImage = container?.snapshot()
+        view.alpha = 0
+        container?.addSubview(view)
+        
+        UIView.setAnimationsEnabled(true)
+        view.showWithAnimate()
     }
     
     func previewOne(_ image: UIImage) {
         let cell = PhotoGroupCell(image)
+        self.cells = [cell]
         self.scrollView.addSubview(cell)
         cell.x = 10
     }
@@ -144,14 +157,14 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
     }
     func setupUI() {
         contentView = UIView(frame: self.bounds)
-        if let img = snapshotImage {
-            
-        }
-//        contentView.backgroundColor = UIColor(0x000000, 0.3)
+        backgroundImageView = UIImageView()
+        contentView.insertSubview(backgroundImageView, at: 0)
+        backgroundImageView.frame = contentView.bounds
         
-//        let effect = UIBlurEffect(style: .dark)
-//        let effectView = UIVisualEffectView(effect: effect)
-//        self.insertSubview(effectView, at: 0)
+        let effect = UIBlurEffect(style: .dark)
+        let effectView = UIVisualEffectView(effect: effect)
+        contentView.addSubview(effectView)
+        effectView.frame = contentView.bounds
         
         scrollView = UIScrollView(frame: CGRect(x: -10, y: 0, width: self.width + 20, height: self.height))
         scrollView.delegate = self
@@ -176,7 +189,7 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
     
     // MARK: 手势处理
     @objc func dismiss(_ sender: UITapGestureRecognizer) {
-        self.removeFromSuperview()
+        self.dismisswithAnimate()
     }
     @objc func doubleTap(_ sender: UITapGestureRecognizer) {
         if let cell = cell(currentPage) {
@@ -197,6 +210,19 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
     }
     @objc func pan(_ sender: UIPanGestureRecognizer) {
         
+    }
+    
+    func showWithAnimate() {
+        UIView.animate(withDuration: 0.25) {
+            self.alpha = 1
+        }
+    }
+    func dismisswithAnimate() {
+        UIView.animate(withDuration: 0.25, animations: {
+            self.alpha = 0
+        }, completion: { _ in
+            self.removeFromSuperview()
+        })
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -256,7 +282,7 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
 class PhotoGroupCell: UIScrollView, UIScrollViewDelegate {
     var containerView: UIView!
     var imageView: UIImageView!
-    var page: Int!
+    var page: Int = 0
     
     convenience init(_ image: UIImage) {
         self.init(frame: .zero)
