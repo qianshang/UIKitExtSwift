@@ -71,7 +71,7 @@ extension UIImage {
     }
     
     public func resize(_ size: CGSize) -> UIImage {
-        return self.draw { _ in
+        return self.draw(size: size) { _ in
             self.draw(in: CGRect(origin: .zero, size: size))
         }
     }
