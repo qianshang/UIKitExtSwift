@@ -57,6 +57,24 @@ extension Int {
         return UIColor(UInt32(self))
     }
 }
+
+/**
+ let c1 = UIColor(0xFF0000)
+ c1.inverseColor
+ UIColor(0x0000FF)
+ let c2 = UIColor(0x0000FF, 0.5)
+ c1 ++ UIColor(0x0000FF)
+ let c3 = c1 ++ c2
+
+ */
+infix operator ++
+public func ++(lhs: UIColor, rhs: UIColor) -> UIColor {
+    let lhsRGB = lhs.cgColor.components ?? [0,0,0,1]
+    let rhsRGB = rhs.cgColor.components ?? [0,0,0,1]
+    
+    return UIColor(red: lhsRGB[0] + rhsRGB[0], green: lhsRGB[1] + rhsRGB[1], blue: lhsRGB[2] + rhsRGB[2], alpha: (lhsRGB[3] + rhsRGB[3]) / 2)
+}
+
 // MARK: - SwiftyColor
 // https://github.com/devxoul/SwiftyColor
 /**:
