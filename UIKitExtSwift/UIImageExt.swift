@@ -261,6 +261,8 @@ public struct ImageColors {
     
     /// The minor color.
     public var minorColor: UIColor!
+    
+    public var averageColor: UIColor!
 }
 
 private class CountedColor {
@@ -282,7 +284,7 @@ extension UIImage {
         let ratio = self.size.width/self.size.height
         
         // calculate new r_width and r_height
-        let r_width: CGFloat = 100
+        let r_width: CGFloat = min(self.size.width, 100)
         let r_height: CGFloat = r_width/ratio
         
         // resize the image to the new r_width and r_height
@@ -356,6 +358,7 @@ extension UIImage {
             backgroundColor = CountedColor(color: blackColor, count: 1)
         }
         result.backgroundColor = backgroundColor.color
+        result.averageColor = UIColor.average(sortedColors.map({ ($0 as! CountedColor).color }))
         
         // create theme colors, contrast theme color with background color in lightness, and select cognizable chromatic aberration among theme colors
         let isDarkBackgound = result.backgroundColor.isDark
