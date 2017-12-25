@@ -51,12 +51,43 @@ extension UIColor {
         }
         return hexString
     }
+    
+    public static func average(_ colors: [UIColor]) -> UIColor {
+        let count = colors.count
+        if count >= 1 {
+            var rawCount: CGFloat = 0
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var a: CGFloat = 0
+            for i in 0..<count {
+                let color = colors[i]
+                let RGB = color.cgColor.components
+                if let rgb = RGB, rgb.count >= 4 {
+                    rawCount += 1
+                    r += rgb[0]
+                    g += rgb[1]
+                    b += rgb[2]
+                    a += rgb[3]
+                }
+            }
+            if rawCount > 0 {
+                return UIColor(red: r / rawCount, green: g / rawCount, blue: b / rawCount, alpha: a / rawCount)
+            } else {
+                return colors.first!
+            }
+        } else {
+            return UIColor(0xFFFFFF)
+        }
+    }
 }
+
 extension Int {
     public var color: UIColor {
         return UIColor(UInt32(self))
     }
 }
+
 // MARK: - SwiftyColor
 // https://github.com/devxoul/SwiftyColor
 /**:
