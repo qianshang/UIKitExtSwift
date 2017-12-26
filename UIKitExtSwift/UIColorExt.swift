@@ -8,6 +8,9 @@
 import Foundation
 import UIKit
 
+
+public typealias RGBA = (CGFloat, CGFloat, CGFloat, CGFloat)
+
 extension UIColor {
     public convenience init(_ hex: UInt32, _ alpha: CGFloat = 1) {
         let r = CGFloat(hex >> 16 & 0xFF) / 255.0
@@ -15,6 +18,10 @@ extension UIColor {
         let b = CGFloat(hex & 0xFF) / 255.0
         
         self.init(red: r, green: g, blue: b, alpha: alpha)
+    }
+    
+    public convenience init(_ rgba: RGBA) {
+        self.init(red: rgba.0, green: rgba.1, blue: rgba.2, alpha: rgba.3)
     }
     
     /**
@@ -52,30 +59,22 @@ extension UIColor {
         return hexString
     }
     
+    public var rgbValue: RGBA {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        
+        return RGBA(r, g, b, a)
+    }
+    
     public static func average(_ colors: [UIColor]) -> UIColor {
         let count = colors.count
         if count >= 1 {
-            var rawCount: CGFloat = 0
-            var r: CGFloat = 0
-            var g: CGFloat = 0
-            var b: CGFloat = 0
-            var a: CGFloat = 0
-            for i in 0..<count {
-                let color = colors[i]
-                let RGB = color.cgColor.components
-                if let rgb = RGB, rgb.count >= 4 {
-                    rawCount += 1
-                    r += rgb[0]
-                    g += rgb[1]
-                    b += rgb[2]
-                    a += rgb[3]
-                }
-            }
-            if rawCount > 0 {
-                return UIColor(red: r / rawCount, green: g / rawCount, blue: b / rawCount, alpha: a / rawCount)
-            } else {
-                return colors.first!
-            }
+            let rgba = averageRGBA(colors.map({ $0.rgbValue }))
+            
+            return UIColor(rgba)
         } else {
             return UIColor(0xFFFFFF)
         }
@@ -99,13 +98,22 @@ extension Int {
  */
 infix operator ++
 public func ++(lhs: UIColor, rhs: UIColor) -> UIColor {
-    let lhsRGB = lhs.cgColor.components ?? [0,0,0,1]
-    let rhsRGB = rhs.cgColor.components ?? [0,0,0,1]
-    if lhsRGB.count >= 4, rhsRGB.count >= 4 {
-        return UIColor(red: lhsRGB[0] + rhsRGB[0], green: lhsRGB[1] + rhsRGB[1], blue: lhsRGB[2] + rhsRGB[2], alpha: (lhsRGB[3] + rhsRGB[3]) / 2)
-    } else {
-        return UIColor.white
-    }
+    return UIColor(lhs.rgbValue ^ rhs.rgbValue)
+}
+
+infix operator ^
+private func ^(lhs: RGBA, rhs: RGBA) -> RGBA {
+    let r: CGFloat = (lhs.0 + rhs.0) * 0.5
+    let g: CGFloat = (lhs.1 + rhs.1) * 0.5
+    let b: CGFloat = (lhs.2 + rhs.2) * 0.5
+    let a: CGFloat = (lhs.3 + rhs.3) * 0.5
+    
+    return (r, g, b, a)
+}
+private func averageRGBA(_ arr: [RGBA]) -> RGBA {
+    let value = arr.reduce((0,0,0,0), { ($0.0 + $1.0, $0.1 + $1.1, $0.2 + $1.2, $0.3 + $1.3) })
+    let count = CGFloat(arr.count)
+    return count <= 0 ?value:(value.0 / count, value.1 / count, value.2 / count, value.3 / count)
 }
 
 // MARK: - SwiftyColor
