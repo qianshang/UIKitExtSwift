@@ -82,6 +82,26 @@ extension UIImage {
         return UIImage(cgImage: imageRef!)
     }
     
+    var originalImage: UIImage {
+        let img = self.withRenderingMode(.alwaysOriginal)
+        return img
+    }
+    
+    public func add(_ image: UIImage, point: CGPoint? = nil) -> UIImage {
+        let contentSize = self.size
+        let imageSize = image.size
+        
+        if imageSize.width > contentSize.width || imageSize.height > contentSize.height {
+            return self
+        }
+        let pt = point == nil ?CGPoint(x: (contentSize.width - imageSize.width) * 0.5, y: 0):point!
+        
+        return self.draw { [weak self] _ in
+            self?.draw(at: .zero)
+            image.draw(at: pt)
+        }
+    }
+    
     @discardableResult
     public func fixOrientation() -> UIImage {
         if self.imageOrientation == .up {

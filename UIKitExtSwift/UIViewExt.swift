@@ -92,7 +92,7 @@ extension UIView {
     }
     public var height: CGFloat {
         set {
-            updateFrame { $0.size.width = newValue }
+            updateFrame { $0.size.height = newValue }
         }
         get {
             return self.frame.height
