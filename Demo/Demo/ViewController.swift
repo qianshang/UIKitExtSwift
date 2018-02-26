@@ -9,93 +9,136 @@
 import UIKit
 import UIKitExtSwift
 
+
+let kScreenWidth: CGFloat = UIScreen.main.bounds.width
+
 class ViewController: UIViewController {
 
+    private let kColorsCellResuseId: String     = "ColorsCell"
+    private let kImageViewsCellResuseId: String = "ImageViewsCell"
+    private let kButtonsCellResuseId: String    = "ButtonsCell"
+    private var tableView: UITableView = UITableView(frame: .zero, style: .grouped)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let size = CGSize(width: 100, height: 100)
-        let rect = CGRect(origin: .zero, size: size)
-        let colors: [UIColor] = [.red, .blue, .yellow]
         
-        self.view.backgroundColor = UIColor.gradientColor(.zero, endPoint: CGPoint(x: 1, y: 1), frame: self.view.bounds, colors: [.white, .black])
-        
-        
-        let img1 = UIImage.init(color: .blue, size: size, storkColor: .red, storkWidth: 10, radius: 50)
-        let v1 = create(img: img1)
-        v1.y = 20
-
-        let img2 = UIImage.linerGradient(colors: colors, size: size)
-        let v2 = create(img: img2)
-        v2.y = v1.maxY + 10
-
-        let img3 = try! UIImage.qrcode(content: "UIKitExtSwift", size: size)
-        let v3 = create(img: img3!)
-        v3.y = v2.maxY + 10
-
-        let color = UIColor.radialGradientColor(rect, colors: colors)!
-        let img4 = UIImage.init(color: color, size: size)
-        let v4 = create(img: img4)
-        v4.y = v3.maxY + 10
+        setupUI()
     }
     
-    func create(img: UIImage) -> UIView {
-        let size = img.size
-        let screenWidth = UIScreen.main.bounds.width
-        let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: screenWidth, height: size.height)))
-        self.view.addSubview(view)
+    func setupUI() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.register(ColorsCell.self, forCellReuseIdentifier: kColorsCellResuseId)
+        tableView.register(ImageViewsCell.self, forCellReuseIdentifier: kImageViewsCellResuseId)
+        tableView.register(ButtonsCell.self, forCellReuseIdentifier: kButtonsCellResuseId)
+        self.view.addSubview(tableView)
+        tableView.frame = self.view.bounds
         
-        let imageView = UIImageView(image: img)
-        view.addSubview(imageView)
-        imageView.isCouldPreview = true
-        imageView.groupId = 0
-        imageView.frame = CGRect(origin: .zero, size: size)
-        
-        imageView.touchAreaInset = UIEdgeInsetsMake(-20, -20, -20, -20)
-        
-        let validWidth: CGFloat = screenWidth - imageView.maxX - 10
-        let validHeight: CGFloat = imageView.height
-        let texts: [String] = [
-            "背景色:\t",
-            "主色调:\t",
-            "副色调:\t",
-            "少量色:\t"]
-        let colors: [UIColor] = [
-            img.colors.backgroundColor,
-            img.colors.primaryColor,
-            img.colors.secondaryColor,
-            img.colors.minorColor
-        ]
-        for i in 0..<4 {
-            let text = texts[i]
-            let color = colors[i]
-            let label = UILabel.init("\(text)\(color.hexString)", textColor: color)
-            view.addSubview(label)
-            
-            label.frame = CGRect(x: imageView.maxX + 10, y: (validHeight / 4) * CGFloat(i), width: validWidth, height: validHeight / 4)
-        }
-        
-//        view.backgroundColor = img.colors.backgroundColor.inverseColor
-        
-        return view
+        tableView.dataSource = self
+        tableView.delegate = self
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
+    
 }
 
+
+extension ViewController: UITableViewDataSource, UITableViewDelegate {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = cellForRow(at: indexPath) else {
+            return tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        }
+        return cell
+    }
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return titleForHeader(in: section)
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return heightForRow(at: indexPath)
+    }
+    
+    func titleForHeader(in section: Int) -> String? {
+        switch section {
+        case 0:
+            return "UIColor"
+        case 1:
+            return "UIImageView"
+        case 2:
+            return "UIButton"
+        case 3:
+            return "UIView"
+        default:
+            return nil
+        }
+    }
+    func heightForRow(at indexPath: IndexPath) -> CGFloat {
+        switch (indexPath.section, indexPath.row) {
+        case (0, _):
+            return ColorsCell.cellHeight
+        case (1, _):
+            return ImageViewsCell.cellHeight
+        case (2, _):
+            return ButtonsCell.cellHeight
+        default:
+            return 0
+        }
+    }
+    func cellForRow(at indexPath: IndexPath) -> UITableViewCell? {
+        switch (indexPath.section, indexPath.row) {
+        case (0, let row):
+            return colorsCell(in: row)
+        case (1, let row):
+            return imageViewCell(in: row)
+        case (2, let row):
+            return buttonCell(in: row)
+        default:
+            return nil
+        }
+    }
+    func colorsCell(in row: Int) -> UITableViewCell? {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kColorsCellResuseId)
+        
+        return cell
+    }
+    func imageViewCell(in row: Int) -> UITableViewCell? {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kImageViewsCellResuseId)
+        
+        return cell
+    }
+    func buttonCell(in row: Int) -> UITableViewCell? {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kButtonsCellResuseId)
+        
+        return cell
+    }
+}
+
+
 extension String {
-    public func textSize(_ font: UIFont,
-                         validWidth: CGFloat = UIScreen.main.bounds.width,
-                         maxHeight: CGFloat = CGFloat(Float.greatestFiniteMagnitude)) -> CGSize {
-        let validSize = CGSize(width: validWidth, height: maxHeight)
-        let options: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
-        let attributes = [NSAttributedStringKey.font: font]
-        return (self as NSString).boundingRect(with: validSize,
-                                               options: options,
-                                               attributes: attributes,
+    public func contentHeight(maxWidth: CGFloat, font: UIFont) -> CGFloat {
+        let size: CGSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        let attribute = [NSAttributedStringKey.font: font]
+        return (self as NSString).boundingRect(with: size,
+                                               options: [.usesLineFragmentOrigin],
+                                               attributes: attribute,
+                                               context: nil).size.height
+    }
+    public func contentWidth(maxHeight: CGFloat, font: UIFont) -> CGFloat {
+        let size: CGSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: maxHeight)
+        let attribute = [NSAttributedStringKey.font: font]
+        return (self as NSString).boundingRect(with: size,
+                                               options: [.usesLineFragmentOrigin],
+                                               attributes: attribute,
+                                               context: nil).size.width
+    }
+    public func contentSize(maxWidth: CGFloat, font: UIFont) -> CGSize {
+        let size: CGSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
+        let attribute = [NSAttributedStringKey.font: font]
+        return (self as NSString).boundingRect(with: size,
+                                               options: [.usesLineFragmentOrigin],
+                                               attributes: attribute,
                                                context: nil).size
     }
 }

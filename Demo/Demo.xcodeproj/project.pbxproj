@@ -12,6 +12,9 @@
 		0480E9601FEA0BEC00FCF2D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0480E95E1FEA0BEC00FCF2D7 /* Main.storyboard */; };
 		0480E9621FEA0BEC00FCF2D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0480E9611FEA0BEC00FCF2D7 /* Assets.xcassets */; };
 		0480E9651FEA0BEC00FCF2D7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0480E9631FEA0BEC00FCF2D7 /* LaunchScreen.storyboard */; };
+		04894D0920440EFF0098523B /* ColorsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04894D0820440EFF0098523B /* ColorsCell.swift */; };
+		04894D0B20440FAD0098523B /* ImageViewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04894D0A20440FAD0098523B /* ImageViewsCell.swift */; };
+		04894D0D20440FB90098523B /* ButtonsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04894D0C20440FB90098523B /* ButtonsCell.swift */; };
 		7CF99659830F5A2493DA7B43 /* Pods_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 469FBEA5C8B2D03B0EFBBB60 /* Pods_Demo.framework */; };
 /* End PBXBuildFile section */
 
@@ -23,7 +26,9 @@
 		0480E9611FEA0BEC00FCF2D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0480E9641FEA0BEC00FCF2D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0480E9661FEA0BEC00FCF2D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0480E96C1FEA0E1600FCF2D7 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		04894D0820440EFF0098523B /* ColorsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsCell.swift; sourceTree = "<group>"; };
+		04894D0A20440FAD0098523B /* ImageViewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewsCell.swift; sourceTree = "<group>"; };
+		04894D0C20440FB90098523B /* ButtonsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsCell.swift; sourceTree = "<group>"; };
 		469FBEA5C8B2D03B0EFBBB60 /* Pods_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D30A28AC0927637454FE57 /* Pods-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.release.xcconfig"; sourceTree = "<group>"; };
 		BB9B728828C916C71AE89F7B /* Pods-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Demo/Pods-Demo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -62,7 +67,7 @@
 		0480E9591FEA0BEC00FCF2D7 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
-				0480E96C1FEA0E1600FCF2D7 /* MyPlayground.playground */,
+				04894D0720440ED70098523B /* Cells */,
 				0480E95A1FEA0BEC00FCF2D7 /* AppDelegate.swift */,
 				0480E95C1FEA0BEC00FCF2D7 /* ViewController.swift */,
 				0480E95E1FEA0BEC00FCF2D7 /* Main.storyboard */,
@@ -71,6 +76,16 @@
 				0480E9661FEA0BEC00FCF2D7 /* Info.plist */,
 			);
 			path = Demo;
+			sourceTree = "<group>";
+		};
+		04894D0720440ED70098523B /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				04894D0820440EFF0098523B /* ColorsCell.swift */,
+				04894D0A20440FAD0098523B /* ImageViewsCell.swift */,
+				04894D0C20440FB90098523B /* ButtonsCell.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		9B78ADD1A7CECCCEA000D0AD /* Pods */ = {
@@ -219,7 +234,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04894D0B20440FAD0098523B /* ImageViewsCell.swift in Sources */,
+				04894D0920440EFF0098523B /* ColorsCell.swift in Sources */,
 				0480E95D1FEA0BEC00FCF2D7 /* ViewController.swift in Sources */,
+				04894D0D20440FB90098523B /* ButtonsCell.swift in Sources */,
 				0480E95B1FEA0BEC00FCF2D7 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

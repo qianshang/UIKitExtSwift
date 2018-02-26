@@ -9,75 +9,89 @@ import Foundation
 import UIKit
 
 
-public typealias RGBA = (CGFloat, CGFloat, CGFloat, CGFloat)
+public struct RGBA {
+    let r: CGFloat
+    let g: CGFloat
+    let b: CGFloat
+    let a: CGFloat
+    
+    static func average(_ rgbas: [RGBA]) -> RGBA {
+        let rawCount: CGFloat = CGFloat(rgbas.count)
+        guard rawCount > 0 else {
+            return RGBA(r: 1, g: 1, b: 1, a: 1)
+        }
+        var r_: CGFloat = 0
+        var g_: CGFloat = 0
+        var b_: CGFloat = 0
+        var a_: CGFloat = 0
+        
+        for rgb in rgbas {
+            r_ += rgb.r
+            g_ += rgb.g
+            b_ += rgb.b
+            a_ += rgb.a
+        }
+        return RGBA(r: r_ / rawCount, g: g_ / rawCount, b: b_ / rawCount, a: a_ / rawCount)
+    }
+}
+
+extension UIKitExt where Base: UIColor {
+    private func hexStringThrows(_ includeAlpha: Bool = true) throws -> String  {
+        guard let rgba: RGBA = self.rgbValue else {
+            throw NSError(domain: "unableToOutputHexStringForWideDisplayColor", code: 1000, userInfo: nil)
+        }
+        let r: Int = Int(rgba.r * 255)
+        let g: Int = Int(rgba.g * 255)
+        let b: Int = Int(rgba.b * 255)
+        let a: Int = Int(rgba.a * 100)
+        
+        guard r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255 else {
+            throw NSError(domain: "unableToOutputHexStringForWideDisplayColor", code: 1000, userInfo: nil)
+        }
+        
+        if (includeAlpha) {
+            return String(format: "#%02X%02X%02X_%d", r, g, b, a)
+        } else {
+            return String(format: "#%02X%02X%02X", r, g, b)
+        }
+    }
+    
+    public var hexString: String?  {
+        guard let hexString = try? hexStringThrows(true) else {
+            return nil
+        }
+        return hexString
+    }
+    
+    public var rgbValue: RGBA? {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        if self.base.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            return RGBA(r: r, g: g, b: b, a: a)
+        } else {
+            return nil
+        }
+    }
+}
 
 extension UIColor {
     public convenience init(_ hex: UInt32, _ alpha: CGFloat = 1) {
-        let r = CGFloat(hex >> 16 & 0xFF) / 255.0
-        let g = CGFloat(hex >> 8 & 0xFF) / 255.0
-        let b = CGFloat(hex & 0xFF) / 255.0
+        let r: CGFloat = CGFloat(hex >> 16 & 0xFF) / 255.0
+        let g: CGFloat = CGFloat(hex >> 8 & 0xFF) / 255.0
+        let b: CGFloat = CGFloat(hex & 0xFF) / 255.0
         
         self.init(red: r, green: g, blue: b, alpha: alpha)
     }
     
     public convenience init(_ rgba: RGBA) {
-        self.init(red: rgba.0, green: rgba.1, blue: rgba.2, alpha: rgba.3)
-    }
-    
-    /**
-     Hex string of a UIColor instance, throws error.
-     
-     - parameter includeAlpha: Whether the alpha should be included.
-     */
-    public func hexStringThrows(_ includeAlpha: Bool = true) throws -> String  {
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        self.getRed(&r, green: &g, blue: &b, alpha: &a)
-        
-        guard r >= 0 && r <= 1 && g >= 0 && g <= 1 && b >= 0 && b <= 1 else {
-            throw NSError(domain: "unableToOutputHexStringForWideDisplayColor", code: 1000, userInfo: nil)
-        }
-        
-        if (includeAlpha) {
-            return String(format: "#%02X%02X%02X_%.2f", Int(r * 255), Int(g * 255), Int(b * 255), a)
-        } else {
-            return String(format: "#%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
-        }
-    }
-    
-    /**
-     Hex string of a UIColor instance, fails to empty string.
-     
-     - parameter includeAlpha: Whether the alpha should be included.
-     */
-    public var hexString: String  {
-        guard let hexString = try? hexStringThrows(true) else {
-            return ""
-        }
-        return hexString
-    }
-    
-    public var rgbValue: RGBA {
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        self.getRed(&r, green: &g, blue: &b, alpha: &a)
-        
-        return RGBA(r, g, b, a)
+        self.init(red: rgba.r, green: rgba.g, blue: rgba.b, alpha: rgba.a)
     }
     
     public static func average(_ colors: [UIColor]) -> UIColor {
-        let count = colors.count
-        if count >= 1 {
-            let rgba = averageRGBA(colors.map({ $0.rgbValue }))
-            
-            return UIColor(rgba)
-        } else {
-            return UIColor(0xFFFFFF)
-        }
+        let rgba: RGBA = RGBA.average(colors.flatMap({ $0.ex.rgbValue }))
+        return UIColor(rgba)
     }
 }
 
@@ -87,78 +101,7 @@ extension Int {
     }
 }
 
-/**
- let c1 = UIColor(0xFF0000)
- c1.inverseColor
- UIColor(0x0000FF)
- let c2 = UIColor(0x0000FF, 0.5)
- c1 ++ UIColor(0x0000FF)
- let c3 = c1 ++ c2
-
- */
-infix operator ++
-public func ++(lhs: UIColor, rhs: UIColor) -> UIColor {
-    return UIColor(lhs.rgbValue ^ rhs.rgbValue)
-}
-
-infix operator ^
-private func ^(lhs: RGBA, rhs: RGBA) -> RGBA {
-    let r: CGFloat = (lhs.0 + rhs.0) * 0.5
-    let g: CGFloat = (lhs.1 + rhs.1) * 0.5
-    let b: CGFloat = (lhs.2 + rhs.2) * 0.5
-    let a: CGFloat = (lhs.3 + rhs.3) * 0.5
-    
-    return (r, g, b, a)
-}
-private func averageRGBA(_ arr: [RGBA]) -> RGBA {
-    let value = arr.reduce((0,0,0,0), { ($0.0 + $1.0, $0.1 + $1.1, $0.2 + $1.2, $0.3 + $1.3) })
-    let count = CGFloat(arr.count)
-    return count <= 0 ?value:(value.0 / count, value.1 / count, value.2 / count, value.3 / count)
-}
-
 // MARK: - SwiftyColor
-// https://github.com/devxoul/SwiftyColor
-/**:
- 
-    let color = 0x123456.color
- 
-    let transparent = 0x123456.color ~ 50%
-    let red = UIColor.red ~ 10%
-    let float = UIColor.blue ~ 0.5 // == 50%
- 
-    let view = UIView()
-    view.alpha = 30% // == 0.3
- 
- */
-precedencegroup AlphaPrecedence {
-    associativity: left
-    higherThan: RangeFormationPrecedence
-    lowerThan: AdditionPrecedence
-}
-
-infix operator ~ : AlphaPrecedence
-
-public func ~ (color: UIColor, alpha: Int) -> UIColor {
-    return color ~ CGFloat(alpha)
-}
-public func ~ (color: UIColor, alpha: Float) -> UIColor {
-    return color ~ CGFloat(alpha)
-}
-public func ~ (color: UIColor, alpha: CGFloat) -> UIColor {
-    return color.withAlphaComponent(alpha)
-}
-
-/// e.g. `50%`
-postfix operator %
-public postfix func % (percent: Int) -> CGFloat {
-    return CGFloat(percent)%
-}
-public postfix func % (percent: Float) -> CGFloat {
-    return CGFloat(percent)%
-}
-public postfix func % (percent: CGFloat) -> CGFloat {
-    return percent / 100
-}
 
 // MARK: - BCColor
 // https://github.com/boycechang/BCColor/tree/master/BCColor/BCColor

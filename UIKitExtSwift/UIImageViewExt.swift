@@ -231,15 +231,21 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
         let page: NSInteger = NSInteger(self.scrollView.contentOffset.x / self.scrollView.width + 0.5)
         currentPage = page
         for i in max(page-1, 0)...min(page+1, imageViews.count-1) {
+            var cell_: PhotoGroupCell!
+            
             if let cell = cell(i) {
                 cell.config(imageViews[i].image!)
+                cell_ = cell
             } else {
-                let cell = dequeueCell()
-                cell.page = i
+                cell_ = dequeueCell()
+                cell_.page = i
                 let img = imageViews[i].image
-                cell.config(img)
-                self.scrollView.addSubview(cell)
-                cell.x = (scrollView.width) * CGFloat(i) + 10
+                cell_.config(img)
+            }
+            
+            if cell_.superview == nil {
+                self.scrollView.addSubview(cell_)
+                cell_.x = (scrollView.width) * CGFloat(i) + 10
             }
         }
     }
@@ -251,8 +257,8 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
                 if (cell.x > scrollView.contentOffset.x + scrollView.width * 2) ||
                     (cell.maxX < scrollView.contentOffset.x - scrollView.width) {
                     cell.removeFromSuperview()
-                    cell.page = -1
-                    cell.config(nil)
+//                    cell.page = -1
+//                    cell.config(nil)
                 }
             }
         }
