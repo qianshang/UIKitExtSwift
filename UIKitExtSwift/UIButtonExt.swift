@@ -9,21 +9,21 @@ import Foundation
 import UIKit
 
 public enum ImageDirection {
-    case left
-    case right
-    case top(CGFloat)
-    case bottom(CGFloat)
+    case left(distance: CGFloat)
+    case right(distance: CGFloat)
+    case top(distance: CGFloat)
+    case bottom(distance: CGFloat)
     
     fileprivate static func build(with direction: Int, distance: CGFloat) -> ImageDirection {
         switch direction {
         case 1:
-            return .right
+            return .right(distance: distance)
         case 2:
-            return .top(distance)
+            return .top(distance: distance)
         case 3:
-            return .bottom(distance)
+            return .bottom(distance: distance)
         default:
-            return .left
+            return .left(distance: distance)
         }
     }
 }
@@ -70,10 +70,16 @@ extension UIButton {
     
     func setImageDirection(_ diretion: ImageDirection) {
         switch diretion {
-        case .left:
+        case .left(distance: let distance):
+            self.titleEdgeInsets = UIEdgeInsetsMake(0, distance * 0.5, 0, -distance * 0.5)
+            self.imageEdgeInsets = UIEdgeInsetsMake(0, -distance * 0.5, 0, distance * 0.5)
+            
             self.imageDirection = 0
-            self.imageDistance = 0
-        case .right:
+            self.imageDistance = distance
+        case .right(distance: let distance):
+            self.titleEdgeInsets = UIEdgeInsetsMake(0, -distance * 0.5, 0, distance * 0.5)
+            self.imageEdgeInsets = UIEdgeInsetsMake(0, distance * 0.5, 0, -distance * 0.5)
+            
             if #available(iOS 9.0, *) {
                 self.semanticContentAttribute = .forceRightToLeft
             } else {
@@ -83,23 +89,23 @@ extension UIButton {
             }
             
             self.imageDirection = 1
-            self.imageDistance = 0
-        case .top(let spacing):
+            self.imageDistance = distance
+        case .top(distance: let distance):
             updateContent { titleSize, imageSize in
-                self.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: -imageSize.width, bottom: -(imageSize.height + spacing), right: 0.0)
-                self.imageEdgeInsets = UIEdgeInsets(top: -(titleSize.height + spacing), left: 0.0, bottom: 0.0, right: -titleSize.width)
+                self.titleEdgeInsets = UIEdgeInsets(top: (imageSize.height + distance) * 0.5, left: -imageSize.width, bottom: -(imageSize.height + distance) * 0.5, right: 0.0)
+                self.imageEdgeInsets = UIEdgeInsets(top: -(titleSize.height + distance) * 0.5, left: 0.0, bottom: (titleSize.height + distance) * 0.5, right: -titleSize.width)
             }
             
             self.imageDirection = 2
-            self.imageDistance = spacing
-        case .bottom(let spacing):
+            self.imageDistance = distance
+        case .bottom(distance: let distance):
             updateContent { titleSize, imageSize in
-                self.titleEdgeInsets = UIEdgeInsets(top: -(imageSize.height + spacing), left: -imageSize.width, bottom: 0.0, right: 0.0)
-                self.imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -(titleSize.height + spacing), right: -titleSize.width)
+                self.titleEdgeInsets = UIEdgeInsets(top: -(imageSize.height + distance) * 0.5, left: -imageSize.width, bottom: (imageSize.height + distance) * 0.5, right: 0.0)
+                self.imageEdgeInsets = UIEdgeInsets(top: (titleSize.height + distance) * 0.5, left: 0.0, bottom: -(titleSize.height + distance) * 0.5, right: -titleSize.width)
             }
             
             self.imageDirection = 3
-            self.imageDistance = spacing
+            self.imageDistance = distance
         }
     }
     

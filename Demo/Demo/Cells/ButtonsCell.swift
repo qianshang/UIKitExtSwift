@@ -33,13 +33,13 @@ class ButtonsCell: UITableViewCell {
         let bg: UIImage = UIImage.init(color: .green, size: size, radius: 10)
         let img: UIImage = UIImage.init(color: .red, size: CGSize(width: 30, height: 30), radius: 5)
         
-        let btn1 = addBtn(img: img, title: "图片在左", bg: bg, imageDirection: .left, frame: CGRect(x: 20, y: 10, width: width, height: height))
-        let btn2 = addBtn(img: img, title: "图片在右", bg: bg, imageDirection: .right, frame: CGRect(x: kScreenWidth - width - 20, y: 10, width: width, height: height))
-        let btn3 = addBtn(img: img, title: "图片在上", bg: bg, imageDirection: .top(5), frame: CGRect(x: btn1.x, y: btn1.maxY + 10, width: width, height: height))
-        let btn4 = addBtn(img: img, title: "图片在下", bg: bg, imageDirection: .bottom(5), frame: CGRect(x: btn2.x, y: btn3.y, width: width, height: height))
+        let btn1 = addBtn(img: img, title: "图片在左", bg: bg, imageDirection: .left(distance: 5), frame: CGRect(x: 20, y: 10, width: width, height: height))
+        let btn2 = addBtn(img: img, title: "图片在右", bg: bg, imageDirection: .right(distance: 5), frame: CGRect(x: kScreenWidth - width - 20, y: 10, width: width, height: height))
+        let btn3 = addBtn(img: img, title: "图片在上", bg: bg, imageDirection: .top(distance: 5), frame: CGRect(x: btn1.x, y: btn1.maxY + 10, width: width, height: height))
+        let btn4 = addBtn(img: img, title: "图片在下", bg: bg, imageDirection: .bottom(distance: 5), frame: CGRect(x: btn2.x, y: btn3.y, width: width, height: height))
         
-        btn3.shadow()
-        btn4.shadow()
+        btn3.ex.shadow()
+        btn4.ex.shadow()
     }
     
     func addBtn(img: UIImage, title: String, bg: UIImage, imageDirection: ImageDirection, frame: CGRect) -> UIButton {

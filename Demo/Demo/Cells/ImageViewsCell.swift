@@ -52,7 +52,7 @@ class ImageViewsCell: UITableViewCell {
         let imageView = UIImageView(image: img)
         imageView.isCouldPreview = true
         imageView.groupId = 0
-        imageView.touchAreaInset = UIEdgeInsetsMake(-20, -20, -20, -20)
+        imageView.ex.touchEdgeInsets = UIEdgeInsetsMake(-20, -20, -20, -20)
         self.addSubview(imageView)
         
         return imageView

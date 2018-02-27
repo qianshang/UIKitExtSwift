@@ -32,7 +32,7 @@ class ColorsCell: UITableViewCell {
         let count: CGFloat = CGFloat(floor((ColorsCell.cellHeight - 20) / itemHeight))
         let spec: CGFloat = (ColorsCell.cellHeight - 20 - itemHeight * count) / (count + 1)
         for i in 0..<Int(count) {
-            let v = createItem(with: UIColor(arc4random() % 0xFFFFFF))
+            let v = createItem(with: (arc4random() % 0xFFFFFF).ex.color)
             self.addSubview(v)
             v.frame = CGRect(x: 0, y: 10 + (itemHeight + spec) * CGFloat(i), width: kScreenWidth, height: itemHeight)
         }

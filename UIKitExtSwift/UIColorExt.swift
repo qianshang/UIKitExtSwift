@@ -95,9 +95,9 @@ extension UIColor {
     }
 }
 
-extension Int {
+extension UIKitExt where Base == UInt32 {
     public var color: UIColor {
-        return UIColor(UInt32(self))
+        return UIColor(self.base)
     }
 }
 

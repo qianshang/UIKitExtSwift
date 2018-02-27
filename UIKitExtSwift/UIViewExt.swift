@@ -102,7 +102,7 @@ extension UIView {
 
 extension UIView {
     @discardableResult
-    public func shadow(color: UIColor = .gray,
+    fileprivate func makeShadow(color: UIColor = .gray,
                        offsetX: CGFloat = 3,
                        offsetY: CGFloat = 3,
                        radius: CGFloat = 1,
@@ -120,14 +120,14 @@ extension UIView {
         return self
     }
     
-    public func snapshot() -> UIImage? {
+    fileprivate func makeSnapshot() -> UIImage? {
         return UIImage.draw(size: self.size) {
             self.layer.render(in: $0!)
         }
     }
+    
+    
 }
-
-
 
 // MARK: change touch area for UIView
 private let swizzling: (UIView.Type) -> () = { view in
@@ -138,6 +138,30 @@ private let swizzling: (UIView.Type) -> () = { view in
     let swizzledMethod = class_getInstanceMethod(view, swizzledSelector)
     
     method_exchangeImplementations(originalMethod!, swizzledMethod!)
+}
+
+extension UIKitExt where Base: UIView {
+    public var touchEdgeInsets: UIEdgeInsets {
+        set { self.base.touchAreaInset = newValue }
+        get { return self.base.touchAreaInset }
+    }
+    
+    public func snapshot() -> UIImage? {
+        return self.base.makeSnapshot()
+    }
+    
+    @discardableResult
+    public func shadow(color: UIColor = .gray,
+                       offsetX: CGFloat = 3,
+                       offsetY: CGFloat = 3,
+                       radius: CGFloat = 1,
+                       opacity: Float = 1) -> UIView {
+        return self.base.makeShadow(color: color, offsetX: offsetX, offsetY: offsetY, radius: radius, opacity: opacity)
+    }
+    
+    public func mask(with path: UIBezierPath) {
+        
+    }
 }
 
 extension UIApplication {
@@ -155,7 +179,7 @@ extension UIApplication {
 extension UIView {
     private static let touchAreaInsetPointer = ObjectAssociation<UIEdgeInsets>()
     
-    public var touchAreaInset: UIEdgeInsets {
+    fileprivate var touchAreaInset: UIEdgeInsets {
         set { UIView.touchAreaInsetPointer[self] = newValue }
         get { return UIView.touchAreaInsetPointer[self] ?? .zero }
     }

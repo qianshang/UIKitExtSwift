@@ -10,8 +10,8 @@ import UIKit
 
 extension UIImageView {
     private static let previewPointer = ObjectAssociation<Bool>()
-    private static let groupPointer = ObjectAssociation<Int>()
-    private static let indexPointer = ObjectAssociation<Int>()
+    private static let groupPointer  = ObjectAssociation<Int>()
+    private static let indexPointer  = ObjectAssociation<Int>()
     private static let originPointer = ObjectAssociation<URL>()
     
     public var isCouldPreview: Bool {
@@ -119,7 +119,7 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
         }
         
         let container = currentViewController().view
-        view.snapshotImage = container?.snapshot()
+        view.snapshotImage = container?.ex.snapshot()
         view.alpha = 0
         container?.addSubview(view)
         
@@ -257,8 +257,6 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
                 if (cell.x > scrollView.contentOffset.x + scrollView.width * 2) ||
                     (cell.maxX < scrollView.contentOffset.x - scrollView.width) {
                     cell.removeFromSuperview()
-//                    cell.page = -1
-//                    cell.config(nil)
                 }
             }
         }

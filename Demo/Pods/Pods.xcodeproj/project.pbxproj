@@ -10,7 +10,6 @@
 		047735541FEA4B1200FEEE14 /* UIViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735521FEA4B0A00FEEE14 /* UIViewExt.swift */; };
 		047735561FEA73FC00FEEE14 /* UIColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735551FEA73FC00FEEE14 /* UIColorExt.swift */; };
 		047735581FEA75DD00FEEE14 /* UIButtonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735571FEA75DD00FEEE14 /* UIButtonExt.swift */; };
-		0477355A1FEB535800FEEE14 /* ObjectAssociation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735591FEB535800FEEE14 /* ObjectAssociation.swift */; };
 		0477355C1FEB552700FEEE14 /* UIImageViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477355B1FEB552600FEEE14 /* UIImageViewExt.swift */; };
 		04894D062043DF510098523B /* UIKitExtSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04894D052043DF510098523B /* UIKitExtSwift.swift */; };
 		317E6A20E17D30F00CD3887A020D092F /* UIKitExtSwift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C213128F6DC64B33BB8C52162E875CC /* UIKitExtSwift-dummy.m */; };
@@ -37,7 +36,6 @@
 		047735521FEA4B0A00FEEE14 /* UIViewExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIViewExt.swift; path = UIKitExtSwift/UIViewExt.swift; sourceTree = "<group>"; };
 		047735551FEA73FC00FEEE14 /* UIColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColorExt.swift; path = UIKitExtSwift/UIColorExt.swift; sourceTree = "<group>"; };
 		047735571FEA75DD00FEEE14 /* UIButtonExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIButtonExt.swift; path = UIKitExtSwift/UIButtonExt.swift; sourceTree = "<group>"; };
-		047735591FEB535800FEEE14 /* ObjectAssociation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ObjectAssociation.swift; path = UIKitExtSwift/ObjectAssociation.swift; sourceTree = "<group>"; };
 		0477355B1FEB552600FEEE14 /* UIImageViewExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIImageViewExt.swift; path = UIKitExtSwift/UIImageViewExt.swift; sourceTree = "<group>"; };
 		04894D052043DF510098523B /* UIKitExtSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIKitExtSwift.swift; path = UIKitExtSwift/UIKitExtSwift.swift; sourceTree = "<group>"; };
 		1A419837466575B428A1A0F45CEFE56F /* UIKitExtSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UIKitExtSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,7 +168,6 @@
 			isa = PBXGroup;
 			children = (
 				04894D052043DF510098523B /* UIKitExtSwift.swift */,
-				047735591FEB535800FEEE14 /* ObjectAssociation.swift */,
 				047735551FEA73FC00FEEE14 /* UIColorExt.swift */,
 				3646D6CFADB7E4F7C86A7105AE934D33 /* UIImageExt.swift */,
 				0477355B1FEB552600FEEE14 /* UIImageViewExt.swift */,
@@ -277,7 +274,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0477355C1FEB552700FEEE14 /* UIImageViewExt.swift in Sources */,
-				0477355A1FEB535800FEEE14 /* ObjectAssociation.swift in Sources */,
 				04894D062043DF510098523B /* UIKitExtSwift.swift in Sources */,
 				047735541FEA4B1200FEEE14 /* UIViewExt.swift in Sources */,
 				047735581FEA75DD00FEEE14 /* UIButtonExt.swift in Sources */,
