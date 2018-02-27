@@ -26,6 +26,8 @@ public extension UIKitExtCompatible {
     }
 }
 
+
+extension Int: UIKitExtCompatible {}
 extension UInt32: UIKitExtCompatible {}
 extension UIColor: UIKitExtCompatible {}
 extension UIImage: UIKitExtCompatible {}

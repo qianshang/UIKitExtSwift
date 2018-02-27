@@ -101,6 +101,12 @@ extension UIKitExt where Base == UInt32 {
     }
 }
 
+extension UIKitExt where Base == Int {
+    public var color: UIColor {
+        return UInt32(self.base).ex.color
+    }
+}
+
 // MARK: - SwiftyColor
 
 // MARK: - BCColor
