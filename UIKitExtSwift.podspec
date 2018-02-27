@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "UIKitExtSwift"
-  s.version      = "0.0.5"
+  s.version      = "0.0.6"
   s.summary      = "A short description of UIKitExtSwift."
 
   s.homepage     = "https://github.com/qianshang/UIKitExtSwift"
