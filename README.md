@@ -1,12 +1,17 @@
 # UIKitExtSwift
 UIKit extension of swift
 
-<img src="/Users/mac/Documents/Swift/UIKitExtSwift/preview.jpeg" width = "320" alt="预览图片" align=center />
+- [UIColor](#1)
+- [UIImage](#2)
+- [UIButton](#3)
+- [UIView](#4)
+- [CocoaPods](#5)
 
-[TOC]
+
+<img src="https://github.com/qianshang/UIKitExtSwift/blob/dev/preview.jpeg" width = "320" alt="预览图片" align=center />
 
 
-## UIColor
+## <a name="1"></a>UIColor
 
 ```
 // 使用UInt32创建颜色
@@ -18,7 +23,7 @@ UIColor(0xFF0000, 1)
 UIColor.red.hexString
 ```
 
-## UIImage
+## <a name="2"></a>UIImage
 ```
 // 使用指定颜色创建图片
 public static func `init`(color: UIColor,
@@ -46,7 +51,7 @@ public static func linerGradient(colors: [UIColor],
                                      endPoint: CGPoint? = nil) -> UIImage
 ```
 
-## UIButton
+## <a name="3"></a>UIButton
 
 ```
 public enum ImageDirection {
@@ -61,7 +66,7 @@ public enum ImageDirection {
 btn.ex.imageDirection = .top(distance: 5)
 ```
 
-## UIView
+## <a name="4"></a>UIView
 
 ```
 public var x: CGFloat
@@ -91,7 +96,7 @@ v.ex.shadow()
 v.ex.snapshot()
 ```
 
-## Cocoapods
+## <a name="5"></a>Cocoapods
 
 ```
 pod 'UIKitExtSwift'
