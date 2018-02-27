@@ -1,7 +1,10 @@
 # UIKitExtSwift
 UIKit extension of swift
 
+<img src="/Users/mac/Documents/Swift/UIKitExtSwift/preview.jpeg" width = "320" alt="预览图片" align=center />
+
 [TOC]
+
 
 ## UIColor
 
@@ -82,7 +85,15 @@ public func shadow(color: UIColor = .gray,
                        radius: CGFloat = 1,
                        opacity: Float = 1) -> UIView
 
-let v: UIView
-v.ex.
+let v: UIView = UIView()
+v.ex.touchEdgeInsets = UIEdgeInsetsMake(-20, -20, -20, -20)
+v.ex.shadow()
+v.ex.snapshot()
+```
+
+## Cocoapods
+
+```
+pod 'UIKitExtSwift'
 ```
 

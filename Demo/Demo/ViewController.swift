@@ -11,12 +11,14 @@ import UIKitExtSwift
 
 
 let kScreenWidth: CGFloat = UIScreen.main.bounds.width
+let kScreenHeight: CGFloat = UIScreen.main.bounds.height
 
 class ViewController: UIViewController {
 
     private let kColorsCellResuseId: String     = "ColorsCell"
     private let kImageViewsCellResuseId: String = "ImageViewsCell"
     private let kButtonsCellResuseId: String    = "ButtonsCell"
+    private let kViewsCellResuseId: String      = "ViewsCell"
     private var tableView: UITableView = UITableView(frame: .zero, style: .grouped)
     
     override func viewDidLoad() {
@@ -30,11 +32,23 @@ class ViewController: UIViewController {
         tableView.register(ColorsCell.self, forCellReuseIdentifier: kColorsCellResuseId)
         tableView.register(ImageViewsCell.self, forCellReuseIdentifier: kImageViewsCellResuseId)
         tableView.register(ButtonsCell.self, forCellReuseIdentifier: kButtonsCellResuseId)
+        tableView.register(ViewCell.self, forCellReuseIdentifier: kViewsCellResuseId)
         self.view.addSubview(tableView)
         tableView.frame = self.view.bounds
+        tableView.contentInset = UIEdgeInsetsMake(30, 0, 0, 0)
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        tableView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(snapshot)))
+    }
+    
+    @objc func snapshot() {
+        guard let img: UIImage = tableView.ex.snapshot() else {
+            return
+        }
+        let activity: UIActivityViewController = UIActivityViewController(activityItems: [img], applicationActivities: nil)
+        self.showDetailViewController(activity, sender: nil)
     }
     
 }
@@ -42,7 +56,7 @@ class ViewController: UIViewController {
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
@@ -59,17 +73,20 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return heightForRow(at: indexPath)
     }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 20
+    }
     
     func titleForHeader(in section: Int) -> String? {
         switch section {
         case 0:
-            return "UIColor"
+            return "颜色"
         case 1:
-            return "UIImageView"
+            return "图片"
         case 2:
-            return "UIButton"
+            return "按钮"
         case 3:
-            return "UIView"
+            return "视图"
         default:
             return nil
         }
@@ -82,6 +99,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             return ImageViewsCell.cellHeight
         case (2, _):
             return ButtonsCell.cellHeight
+        case (3, _):
+            return ViewCell.cellHeight
         default:
             return 0
         }
@@ -94,6 +113,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             return imageViewCell(in: row)
         case (2, let row):
             return buttonCell(in: row)
+        case (3, let row):
+            return viewCell(in: row)
         default:
             return nil
         }
@@ -110,6 +131,11 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     func buttonCell(in row: Int) -> UITableViewCell? {
         let cell = tableView.dequeueReusableCell(withIdentifier: kButtonsCellResuseId)
+        
+        return cell
+    }
+    func viewCell(in row: Int) -> UITableViewCell? {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kViewsCellResuseId)
         
         return cell
     }

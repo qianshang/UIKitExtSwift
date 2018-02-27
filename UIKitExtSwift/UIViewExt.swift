@@ -126,7 +126,6 @@ extension UIView {
         }
     }
     
-    
 }
 
 // MARK: change touch area for UIView
@@ -160,7 +159,13 @@ extension UIKitExt where Base: UIView {
     }
     
     public func mask(with path: UIBezierPath) {
-        
+        if let maskLayer: CAShapeLayer = self.base.layer.mask as? CAShapeLayer {
+            maskLayer.path = path.cgPath
+        } else {
+            let maskLayer: CAShapeLayer = CAShapeLayer()
+            maskLayer.path = path.cgPath
+            self.base.layer.mask = maskLayer
+        }
     }
 }
 

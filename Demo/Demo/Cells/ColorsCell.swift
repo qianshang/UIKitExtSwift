@@ -11,7 +11,7 @@ import UIKitExtSwift
 
 class ColorsCell: UITableViewCell {
 
-    static let cellHeight: CGFloat = 100
+    static let cellHeight: CGFloat = 70
     
     let textFont: UIFont = UIFont.systemFont(ofSize: 16)
     lazy var itemHeight: CGFloat = textFont.lineHeight
@@ -43,7 +43,7 @@ class ColorsCell: UITableViewCell {
         let img: UIImage = UIImage.init(color: color, size: size, radius: itemHeight * 0.5)
         
         let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: kScreenWidth, height: itemHeight)))
-        self.addSubview(view)
+        self.contentView.addSubview(view)
         
         let imageView = UIImageView(image: img)
         view.addSubview(imageView)
