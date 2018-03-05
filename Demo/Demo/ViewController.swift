@@ -40,7 +40,7 @@ class ViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        tableView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(snapshot)))
+//        tableView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(snapshot)))
     }
     
     @objc func snapshot() {

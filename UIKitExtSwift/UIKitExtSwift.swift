@@ -10,6 +10,7 @@ import UIKit
 
 public final class UIKitExt<Base> {
     public let base: Base
+    
     public init(_ base: Base) {
         self.base = base
     }

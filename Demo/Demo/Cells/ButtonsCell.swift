@@ -42,6 +42,25 @@ class ButtonsCell: UITableViewCell {
         
         btn3.ex.shadow()
         btn4.ex.shadow()
+        
+        btn2.ex.touchUpInside { btn in
+            print("\(btn) clicked 2")
+        }
+        
+        
+        btn1.ex.touchDown { _ in
+            print("btn1 clicked")
+        }
+    }
+    
+    @objc func touchDown() {
+        print("\(#function)--\(#line)")
+    }
+    @objc func touchUpinside() {
+        print("\(#function)--\(#line)")
+    }
+    @objc func touchDownAndUpinside() {
+        print("\(#function)--\(#line)")
     }
     
     func addBtn(img: UIImage, title: String, bg: UIImage, imageDirection: ImageDirection, frame: CGRect) -> UIButton {

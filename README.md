@@ -6,6 +6,7 @@ UIKit extension of swift
 - [UIButton](#3)
 - [UIView](#4)
 - [CocoaPods](#5)
+- [TODO](#100)
 
 
 <img src="https://github.com/qianshang/UIKitExtSwift/blob/dev/preview.jpeg" width = "320" alt="预览图片" align=center />
@@ -60,10 +61,14 @@ public enum ImageDirection {
     case top(distance: CGFloat)
     case bottom(distance: CGFloat)
 }
-```
-指定`UIButton`图片方向以及和文字间的间距
-```
+
+// 指定`UIButton`图片方向以及和文字间的间距
 btn.ex.imageDirection = .top(distance: 5)
+
+// 给按钮添加`touchDown`事件
+btn.ex.touchDown { _ in
+    print("btn clicked")
+}
 ```
 
 ## <a name="4"></a>UIView
@@ -101,4 +106,22 @@ v.ex.snapshot()
 ```
 pod 'UIKitExtSwift'
 ```
+
+## <a name="100"></a>TODO
+
+- [x]使用`Int``UInt32`创建`UIColor`
+- [x]获取`UIColor`的16进制描述
+- [x]使用指定颜色创建图片
+- [x]重置图片大小
+- [x]获取指定区域的图片
+- [x]将图片渲染成指定颜色
+- [x]生成一张二维码图片
+- [x]生成线性渐变图片
+- [x]设置按钮图片位置
+- [x]使用闭包为按钮添加事件处理 _*此处没有找到特别好的方法,所以直接添加了部分event事件支持*_
+- [x]`UIView`的位置相关信息
+- [x]`UIView`点击区域扩充
+- [ ]加载网络图片
+- [ ]图片缓存
+
 
