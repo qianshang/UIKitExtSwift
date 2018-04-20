@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		045EFE652089D39E00D9996A /* UIDeviceExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045EFE642089D39E00D9996A /* UIDeviceExt.swift */; };
 		047735541FEA4B1200FEEE14 /* UIViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735521FEA4B0A00FEEE14 /* UIViewExt.swift */; };
 		047735561FEA73FC00FEEE14 /* UIColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735551FEA73FC00FEEE14 /* UIColorExt.swift */; };
 		047735581FEA75DD00FEEE14 /* UIButtonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047735571FEA75DD00FEEE14 /* UIButtonExt.swift */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		03EA1E60232BFA05817BC26ACB8E68BA /* Pods-Demo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-Demo-umbrella.h"; sourceTree = "<group>"; };
+		045EFE642089D39E00D9996A /* UIDeviceExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIDeviceExt.swift; path = UIKitExtSwift/UIDeviceExt.swift; sourceTree = "<group>"; };
 		047735521FEA4B0A00FEEE14 /* UIViewExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIViewExt.swift; path = UIKitExtSwift/UIViewExt.swift; sourceTree = "<group>"; };
 		047735551FEA73FC00FEEE14 /* UIColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColorExt.swift; path = UIKitExtSwift/UIColorExt.swift; sourceTree = "<group>"; };
 		047735571FEA75DD00FEEE14 /* UIButtonExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIButtonExt.swift; path = UIKitExtSwift/UIButtonExt.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				047735571FEA75DD00FEEE14 /* UIButtonExt.swift */,
 				04894D75204D12700098523B /* UIControlExt.swift */,
 				04894D77204D161F0098523B /* UIApplicationExt.swift */,
+				045EFE642089D39E00D9996A /* UIDeviceExt.swift */,
 				1778A68E545C9BADBC719CBA8A9562BB /* Support Files */,
 			);
 			name = UIKitExtSwift;
@@ -249,7 +252,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0930;
 				TargetAttributes = {
 					14E12DE23CD94CF582FECF24DBBE8A19 = {
 						LastSwiftMigration = 0900;
@@ -282,6 +285,7 @@
 				0477355C1FEB552700FEEE14 /* UIImageViewExt.swift in Sources */,
 				04894D062043DF510098523B /* UIKitExtSwift.swift in Sources */,
 				047735541FEA4B1200FEEE14 /* UIViewExt.swift in Sources */,
+				045EFE652089D39E00D9996A /* UIDeviceExt.swift in Sources */,
 				047735581FEA75DD00FEEE14 /* UIButtonExt.swift in Sources */,
 				047735561FEA73FC00FEEE14 /* UIColorExt.swift in Sources */,
 				04894D76204D12700098523B /* UIControlExt.swift in Sources */,
@@ -460,6 +464,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -467,6 +472,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -515,6 +521,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -522,6 +529,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

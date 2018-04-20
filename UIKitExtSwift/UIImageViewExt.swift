@@ -45,21 +45,6 @@ extension UIImageView {
     
 }
 
-func currentViewController() -> UIViewController {
-    let keyWindow = UIApplication.shared.keyWindow
-    var vc = keyWindow?.rootViewController!
-    
-    while let v = vc?.presentedViewController {
-        if (v.isKind(of: UINavigationController.self)) {
-            vc = (v as! UINavigationController).visibleViewController
-        } else if (v.isKind(of: UITabBarController.self)) {
-            vc = (v as! UITabBarController).selectedViewController
-        }
-    }
-    
-    return vc!
-}
-
 class PhotoGroupView: UIView, UIScrollViewDelegate {
     private var contentView: UIView!
     private var backgroundImageView: UIImageView!
@@ -118,13 +103,16 @@ class PhotoGroupView: UIView, UIScrollViewDelegate {
             view.previewOne(image)
         }
         
-        let container = currentViewController().view
-        view.snapshotImage = container?.ex.snapshot()
-        view.alpha = 0
-        container?.addSubview(view)
-        
-        UIView.setAnimationsEnabled(true)
-        view.showWithAnimate()
+        if let container: UIView = UIApplication.shared.ex.currentViewController?.view {
+            view.snapshotImage = container.ex.snapshot()
+            view.alpha = 0
+            container.addSubview(view)
+            
+            UIView.setAnimationsEnabled(true)
+            view.showWithAnimate()
+        } else {
+            print("The keyWindow need a rootViewController.")
+        }
     }
     
     func previewOne(_ image: UIImage) {

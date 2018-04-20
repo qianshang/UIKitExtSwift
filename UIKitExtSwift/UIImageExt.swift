@@ -82,7 +82,7 @@ extension UIImage {
         return UIImage(cgImage: imageRef!)
     }
     
-    var originalImage: UIImage {
+    public var originalImage: UIImage {
         let img = self.withRenderingMode(.alwaysOriginal)
         return img
     }
@@ -202,6 +202,7 @@ extension UIImage {
             context?.fill(rect)
         }
     }
+    
     
     public func gaussianBlur(radius: CGFloat) -> UIImage {
         do {

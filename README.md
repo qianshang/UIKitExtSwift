@@ -5,7 +5,10 @@ UIKit extension of swift
 - [UIImage](#2)
 - [UIButton](#3)
 - [UIView](#4)
-- [CocoaPods](#5)
+- [UIApplication](#5)
+- [UIControl](#6)
+- [UIDevice](#7)
+- [CocoaPods](#99)
 - [TODO](#100)
 
 
@@ -64,11 +67,6 @@ public enum ImageDirection {
 
 // 指定`UIButton`图片方向以及和文字间的间距
 btn.ex.imageDirection = .top(distance: 5)
-
-// 给按钮添加`touchDown`事件
-btn.ex.touchDown { _ in
-    print("btn clicked")
-}
 ```
 
 ## <a name="4"></a>UIView
@@ -101,7 +99,43 @@ v.ex.shadow()
 v.ex.snapshot()
 ```
 
-## <a name="5"></a>Cocoapods
+## <a name="5"></a>UIApplication
+
+```
+// 直接通过UIApplication.shared实例获取当前栈顶控制器
+UIApplication.shared.ex.currentViewController?
+```
+
+## <a name="6"></a>UIControl
+
+使用`closure`为`UIControl`对象添加事件处理
+当前支持通过这种方式添加的事件如下：
+- `ouchDown`
+- `touchDownRepeat`
+- `touchDragInside`
+- `touchDragOutside`
+- `touchDragEnter`
+- `touchDragExit`
+- `touchUpInside`
+- `touchUpOutside`
+- `touchCancel`
+- `valueChanged`
+- `allEvents`
+
+```
+// 给按钮添加`touchDown`事件
+btn.ex.touchDown { _ in
+   print("btn clicked")
+}
+```
+
+## <a name="7"></a>UIDevice
+
+```
+let iPhoneX: Bool = UIDevice.current.ex.deviceType == .iPhoneX
+```
+
+## <a name="99"></a>Cocoapods
 
 ```
 pod 'UIKitExtSwift'
@@ -109,19 +143,18 @@ pod 'UIKitExtSwift'
 
 ## <a name="100"></a>TODO
 
-- [x]使用`Int``UInt32`创建`UIColor`
-- [x]获取`UIColor`的16进制描述
-- [x]使用指定颜色创建图片
-- [x]重置图片大小
-- [x]获取指定区域的图片
-- [x]将图片渲染成指定颜色
-- [x]生成一张二维码图片
-- [x]生成线性渐变图片
-- [x]设置按钮图片位置
-- [x]使用闭包为按钮添加事件处理 _*此处没有找到特别好的方法,所以直接添加了部分event事件支持*_
-- [x]`UIView`的位置相关信息
-- [x]`UIView`点击区域扩充
-- [ ]加载网络图片
-- [ ]图片缓存
-
-
+- ✓ 使用`Int`、`UInt32`创建`UIColor`
+- ✓ 获取`UIColor`的16进制描述
+- ✓ 使用指定颜色创建图片
+- ✓ 重置图片大小
+- ✓ 获取指定区域的图片
+- ✓ 将图片渲染成指定颜色
+- ✓ 生成一张二维码图片
+- ✓ 生成线性渐变图片
+- ✓ 设置按钮图片位置
+- ✓ 使用闭包为按钮添加事件处理 _*此处没有找到特别好的方法,所以直接添加了部分event事件支持*_
+- ✓ `UIView`的位置相关信息
+- ✓ `UIView`点击区域扩充
+- ✓ 当前设备判断
+- ✗ 加载网络图片
+- ✗ 图片缓存

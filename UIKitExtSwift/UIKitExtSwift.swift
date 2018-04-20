@@ -33,6 +33,8 @@ extension UInt32: UIKitExtCompatible {}
 extension UIColor: UIKitExtCompatible {}
 extension UIImage: UIKitExtCompatible {}
 extension UIView: UIKitExtCompatible {}
+extension UIApplication: UIKitExtCompatible {}
+extension UIDevice: UIKitExtCompatible {}
 
 /**:
  # 在extension中添加property

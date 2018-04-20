@@ -7,6 +7,22 @@
 
 import Foundation
 
+extension UIKitExt where Base: UIApplication {
+    public var currentViewController: UIViewController? {
+        var vc: UIViewController? = self.base.keyWindow?.rootViewController
+        
+        while let v = vc?.presentedViewController {
+            if (v.isKind(of: UINavigationController.self)) {
+                vc = (v as! UINavigationController).visibleViewController
+            } else if (v.isKind(of: UITabBarController.self)) {
+                vc = (v as! UITabBarController).selectedViewController
+            }
+        }
+        
+        return vc
+    }
+}
+
 
 extension UIApplication {
     
