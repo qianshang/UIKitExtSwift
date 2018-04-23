@@ -90,7 +90,12 @@ extension UIColor {
     }
     
     public static func average(_ colors: [UIColor]) -> UIColor {
-        let rgba: RGBA = RGBA.average(colors.flatMap({ $0.ex.rgbValue }))
+        var rgba: RGBA
+        #if swift(>=4.1)
+        rgba = RGBA.average(colors.compactMap({ $0.ex.rgbValue }))
+        #else
+        rgba = RGBA.average(colors.flatMap({ $0.ex.rgbValue }))
+        #endif
         return UIColor(rgba)
     }
 }
@@ -106,8 +111,6 @@ extension UIKitExt where Base == Int {
         return UInt32(self.base).ex.color
     }
 }
-
-// MARK: - SwiftyColor
 
 // MARK: - BCColor
 // https://github.com/boycechang/BCColor/tree/master/BCColor/BCColor

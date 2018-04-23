@@ -39,8 +39,9 @@ class ImageViewsCell: UITableViewCell {
         let v2 = create(img: img2)
         v2.origin = CGPoint(x: v1.maxX + 10, y: v1.y)
         
-        let img3 = try! UIImage.qrcode(content: "UIKitExtSwift", size: size)
-        let v3 = create(img: img3!)
+        let img3: UIImage = (try! UIImage.qrcode(content: "UIKitExtSwift", size: size))!
+//        let img3_blur: UIImage = img3.gaussianBlur(radius: 10)
+        let v3 = create(img: img3)
         v3.origin = CGPoint(x: v2.maxX + 10, y: v1.y)
         
         let color = UIColor.radialGradientColor(rect, colors: colors)!

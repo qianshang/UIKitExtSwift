@@ -25,6 +25,10 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        
+        if UIDevice.current.ex.deviceType == .iPhoneX {
+            print("iPhoneX")
+        }
     }
     
     func setupUI() {
@@ -37,10 +41,15 @@ class ViewController: UIViewController {
         tableView.frame = self.view.bounds
         tableView.contentInset = UIEdgeInsetsMake(30, 0, 0, 0)
         
+        
         tableView.dataSource = self
         tableView.delegate = self
         
-//        tableView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(snapshot)))
+        if #available(iOS 11, *) {
+            tableView.contentInsetAdjustmentBehavior = .automatic
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = true
+        }
     }
     
     @objc func snapshot() {

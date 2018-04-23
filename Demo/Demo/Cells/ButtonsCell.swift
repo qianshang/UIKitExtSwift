@@ -43,25 +43,30 @@ class ButtonsCell: UITableViewCell {
         btn3.ex.shadow()
         btn4.ex.shadow()
         
-        btn2.ex.touchUpInside { btn in
-            print("\(btn) clicked 2")
+        btn1.ex.touchDown { btn in
+            print("\(btn) touchDown")
+        }
+        
+        btn1.ex.touchUpInside { [unowned self] btn in
+            self.showAlert(with: "\(btn) touchUpInside")
         }
         
         
-        btn1.ex.touchDown { _ in
-            print("btn1 clicked")
+        btn2.ex.touchUpInside { [unowned self] btn in
+            self.showAlert(with: "\(btn) touchUpInside")
         }
     }
     
-    @objc func touchDown() {
-        print("\(#function)--\(#line)")
+    func showAlert(with message: String?) {
+        DispatchQueue.main.async {
+            let alert: UIAlertController = UIAlertController(title: "提示", message: message, preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "确定", style: .cancel))
+            
+            UIApplication.shared.ex.currentViewController?.showDetailViewController(alert, sender: nil)
+        }
     }
-    @objc func touchUpinside() {
-        print("\(#function)--\(#line)")
-    }
-    @objc func touchDownAndUpinside() {
-        print("\(#function)--\(#line)")
-    }
+    
     
     func addBtn(img: UIImage, title: String, bg: UIImage, imageDirection: ImageDirection, frame: CGRect) -> UIButton {
         let btn: UIButton = UIButton()
