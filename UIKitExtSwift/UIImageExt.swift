@@ -208,7 +208,7 @@ extension UIKitExt where Base: UIImage {
         }
         let pt = point == nil ?CGPoint(x: (contentSize.width - imageSize.width) * 0.5, y: 0):point!
         
-        return ImageDrawer.draw { [weak self] _ in
+        return ImageDrawer.draw(size: contentSize) { [weak self] _ in
             guard let `self` = self else { return }
             self.sourceImage.draw(at: .zero)
             image.draw(at: pt)
@@ -223,7 +223,7 @@ extension UIKitExt where Base: UIImage {
         let r = (r_ > m_) ?m_:r_
         let rect = CGRect(x: 0, y: 0, width: w, height: h)
         
-        return ImageDrawer.draw { [weak self] _ in
+        return ImageDrawer.draw(size: sourceImage.size) { [weak self] _ in
             guard let `self` = self else { return }
             if corners == .allCorners {
                 UIBezierPath(roundedRect: rect, cornerRadius: r).addClip()
@@ -237,14 +237,13 @@ extension UIKitExt where Base: UIImage {
     public func render(_ color: UIColor) -> UIImage {
         let rect = CGRect(origin: .zero, size: sourceImage.size)
         
-        return ImageDrawer.draw(opaque: true) { [weak self] context in
+        return ImageDrawer.draw(size: sourceImage.size, opaque: true) { [weak self] context in
             guard let `self` = self else { return }
+            self.sourceImage.draw(in: rect)
+            context?.setFillColor(color.cgColor)
+            context?.setAlpha(1)
             context?.setBlendMode(.sourceAtop)
-            color.setFill()
-            UIRectFill(rect)
-            
-            self.sourceImage.draw(in: rect, blendMode: CGBlendMode.overlay, alpha: 1)
-            self.sourceImage.draw(in: rect, blendMode: CGBlendMode.destinationIn, alpha: 1)
+            context?.fill(rect)
             } ?? sourceImage
     }
     
