@@ -29,6 +29,9 @@ class ViewController: UIViewController {
         if UIDevice.current.ex.deviceType == .iPhoneX {
             print("iPhoneX")
         }
+        
+//        tableView.backgroundView = UIImageView(image: UIImage.ex.color(with: .green))
+        
     }
     
     func setupUI() {
@@ -178,13 +181,15 @@ extension String {
     }
 }
 extension UILabel {
-    public static func `init`(_ text: String, textColor: UIColor) -> UILabel {
-        let label = UILabel()
-        label.textColor = textColor
-        label.text = text
-        label.font = UIFont.systemFont(ofSize: 18)
-        label.numberOfLines = 0
-        return label
+    convenience init(_ text: String, textColor: UIColor) {
+        defer {
+            self.textColor = textColor
+            self.text = text
+            self.font = UIFont.systemFont(ofSize: 18)
+            self.numberOfLines = 0
+        }
+        self.init()
     }
 }
+
 

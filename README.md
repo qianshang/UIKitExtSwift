@@ -30,29 +30,21 @@ UIColor.red.hexString
 ## <a name="2"></a>UIImage
 ```
 // 使用指定颜色创建图片
-public static func `init`(color: UIColor,
-                              size: CGSize = CGSize(width: 1, height: 1),
-                              storkColor: UIColor? = nil,
-                              storkWidth: CGFloat = 0,
-                              radius: CGFloat = 0,
-                              corners: UIRectCorner = .allCorners) -> UIImage
-// 修改图片大小                             
-public func resize(_ size: CGSize) -> UIImage
-// 获取指定区域的图片
-public func subImage(_ rect: CGRect) -> UIImage
-// 两张图片合成
-public func add(_ image: UIImage, point: CGPoint? = nil) -> UIImage
-// 指定半径和边角裁剪
-public func clips(_ radius: CGFloat, corners: UIRectCorner = .allCorners) -> UIImage
-// 将图片渲染成指定颜色
-public func render(_ color: UIColor) -> UIImage
-// 生成一张二维码
-public static func qrcode(content: String, size: CGSize) throws -> UIImage?
+UIImage.ex.color(with: .blue, size: size, storkColor: .red, storkWidth: 10, radius: 50)
 // 创建线性渐变色图片
-public static func linerGradient(colors: [UIColor],
-                                     size: CGSize,
-                                     startPoint: CGPoint? = nil,
-                                     endPoint: CGPoint? = nil) -> UIImage
+UIImage.ex.linerGradient(colors: colors, size: size)
+// 生成一张二维码
+try! UIImage.ex.qrcode(with: "UIKitExtSwift", size: size)
+// 修改图片大小                             
+image.ex.resize(size)
+// 获取指定区域的图片
+image.ex.subImage(rect)
+// 两张图片合成
+image.ex.add(flagImage)
+// 指定半径和边角裁剪
+image.ex.clip(5)
+// 将图片渲染成指定颜色
+image.ex.render(.gray)
 ```
 
 ## <a name="3"></a>UIButton
@@ -156,5 +148,4 @@ pod 'UIKitExtSwift'
 - ✓ `UIView`的位置相关信息
 - ✓ `UIView`点击区域扩充
 - ✓ 当前设备判断
-- ✗ 加载网络图片
-- ✗ 图片缓存
+

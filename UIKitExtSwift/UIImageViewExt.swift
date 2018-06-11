@@ -8,6 +8,17 @@
 import Foundation
 import UIKit
 
+
+extension UIKitExt where Base: UIImageView {
+    public func renderImage(with color: UIColor) {
+        let imageView = base as UIImageView
+        
+        imageView.image = imageView.image?.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = color
+    }
+}
+
+
 extension UIImageView {
     private static let previewPointer = ObjectAssociation<Bool>()
     private static let groupPointer  = ObjectAssociation<Int>()

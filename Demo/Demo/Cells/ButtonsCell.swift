@@ -32,8 +32,8 @@ class ButtonsCell: UITableViewCell {
         let width: CGFloat = itemW
         let height: CGFloat = 60
         let size: CGSize = CGSize(width: width, height: height)
-        let bg: UIImage = UIImage.init(color: .green, size: size, radius: 10)
-        let img: UIImage = UIImage.init(color: .red, size: CGSize(width: 30, height: 30), radius: 5)
+        let bg: UIImage = UIImage.ex.color(with: .green, size: size, radius: 10)
+        let img: UIImage = UIImage.ex.color(with: .red, size: CGSize(width: 30, height: 30), radius: 5)
         
         let btn1 = addBtn(img: img, title: "左", bg: bg, imageDirection: .left(distance: 5), frame: CGRect(x: 20, y: 10, width: width, height: height))
         let btn2 = addBtn(img: img, title: "右", bg: bg, imageDirection: .right(distance: 5), frame: CGRect(x: btn1.maxX + 10, y: btn1.y, width: width, height: height))
@@ -43,12 +43,8 @@ class ButtonsCell: UITableViewCell {
         btn3.ex.shadow()
         btn4.ex.shadow()
         
-        btn1.ex.touchDown { btn in
-            print("\(btn) touchDown")
-        }
-        
-        btn1.ex.touchUpInside { [unowned self] btn in
-            self.showAlert(with: "\(btn) touchUpInside")
+        btn1.ex.touchDown { [unowned self] btn in
+            self.showAlert(with: "\(btn) touchDown")
         }
         
         

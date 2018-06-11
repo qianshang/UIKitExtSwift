@@ -31,7 +31,9 @@ public extension UIKitExtCompatible {
 extension Int: UIKitExtCompatible {}
 extension UInt32: UIKitExtCompatible {}
 extension UIColor: UIKitExtCompatible {}
-extension UIImage: UIKitExtCompatible {}
+extension UIImage: UIKitExtCompatible {
+    public typealias ex = UIKitExt<UIImage>
+}
 extension UIView: UIKitExtCompatible {}
 extension UIApplication: UIKitExtCompatible {}
 extension UIDevice: UIKitExtCompatible {}

@@ -10,15 +10,12 @@ import UIKit
 import ImageIO
 import Accelerate
 
-
-// MARK: - Draw
-extension UIImage {
+final class ImageDrawer {
     public typealias Drawer = (CGContext?) -> Void
-    
-    public static func draw(size: CGSize = CGSize(width: 1, height: 1),
-                            opaque: Bool = false,
-                            scale: CGFloat = UIScreen.main.scale,
-                            drawer: Drawer? = nil) -> UIImage? {
+    public class func draw(size: CGSize = CGSize(width: 1, height: 1),
+                           opaque: Bool = false,
+                           scale: CGFloat = UIScreen.main.scale,
+                           drawer: Drawer? = nil) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
         
         drawer?(UIGraphicsGetCurrentContext())
@@ -28,94 +25,30 @@ extension UIImage {
         
         return image
     }
-    public func draw(size: CGSize? = nil,
-                     opaque: Bool = false,
-                     scale: CGFloat? = nil,
-                     drawer: Drawer? = nil) -> UIImage {
-        let size = size ?? self.size
-        let scale = scale ?? self.scale
-        return UIImage.draw(size: size, opaque: opaque, scale: scale, drawer: drawer) ?? self
-    }
 }
 
-extension UIImage {
+extension UIKitExt where Base: UIImage {
     
-    public static func `init`(color: UIColor,
-                              size: CGSize = CGSize(width: 1, height: 1),
-                              storkColor: UIColor? = nil,
-                              storkWidth: CGFloat = 0,
-                              radius: CGFloat = 0,
-                              corners: UIRectCorner = .allCorners) -> UIImage {
-        let scale = UIScreen.main.scale
-        var rawRect = CGRect(origin: .zero, size: size)
-        
-        if (storkWidth > 0) {
-            rawRect.origin.x    += storkWidth
-            rawRect.origin.y    += storkWidth
-            rawRect.size.width  -= (storkWidth * 2)
-            rawRect.size.height -= (storkWidth * 2)
-        }
-        
-        let path = UIBezierPath.init(roundedRect: rawRect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        
-        return UIImage.draw(size: size, opaque: false, scale: scale, drawer: { _ in
-            color.setFill()
-            if let sc = storkColor {
-                sc.setStroke()
-            }
-            
-            path.fill()
-            path.lineWidth = storkWidth
-            path.stroke()
-        }) ?? UIImage()
+    private var sourceImage: UIImage {
+        return base as UIImage
     }
     
-    public func resize(_ size: CGSize) -> UIImage {
-        return self.draw(size: size) { _ in
-            self.draw(in: CGRect(origin: .zero, size: size))
-        }
+    public var original: UIImage {
+        return sourceImage.withRenderingMode(.alwaysOriginal)
     }
     
-    
-    public func subImage(_ rect: CGRect) -> UIImage {
-        let imageRef = CGImage.cropping(self.cgImage!)(to: rect)
-        return UIImage(cgImage: imageRef!)
-    }
-    
-    public var originalImage: UIImage {
-        let img = self.withRenderingMode(.alwaysOriginal)
-        return img
-    }
-    
-    public func add(_ image: UIImage, point: CGPoint? = nil) -> UIImage {
-        let contentSize = self.size
-        let imageSize = image.size
-        
-        if imageSize.width > contentSize.width || imageSize.height > contentSize.height {
-            return self
-        }
-        let pt = point == nil ?CGPoint(x: (contentSize.width - imageSize.width) * 0.5, y: 0):point!
-        
-        return self.draw { [weak self] _ in
-            self?.draw(at: .zero)
-            image.draw(at: pt)
-        }
-    }
-    
-    @discardableResult
-    public func fixOrientation() -> UIImage {
-        if self.imageOrientation == .up {
-            return self
+    public var fixOrientation: UIImage {
+        if sourceImage.imageOrientation == .up {
+            return sourceImage
         }
         
-        guard let cgImage = self.cgImage else {
-            return self
+        guard let cgImage: CGImage = sourceImage.cgImage,
+            let space: CGColorSpace = cgImage.colorSpace else {
+                return sourceImage
         }
-        guard let space = cgImage.colorSpace else {
-            return self
-        }
+        
         var transform = CGAffineTransform.identity
-        let size = self.size
+        let size = sourceImage.size
         let width = size_t(size.width)
         let height = size_t(size.height)
         
@@ -127,9 +60,9 @@ extension UIImage {
                                       space: space,
                                       bitmapInfo:cgImage.bitmapInfo.rawValue)
             else {
-                return self
+                return sourceImage
         }
-        switch self.imageOrientation {
+        switch sourceImage.imageOrientation {
         case .down, .downMirrored:
             transform = transform.translatedBy(x: size.width, y: size.height)
             transform = transform.rotated(by: .pi)
@@ -145,7 +78,7 @@ extension UIImage {
         default:
             break
         }
-        switch self.imageOrientation {
+        switch sourceImage.imageOrientation {
         case .upMirrored, .downMirrored:
             transform = transform.translatedBy(x: size.width, y: 0)
             transform = transform.scaledBy(x: -1, y: 1)
@@ -159,7 +92,7 @@ extension UIImage {
         }
         
         context.concatenate(transform)
-        switch self.imageOrientation {
+        switch sourceImage.imageOrientation {
         case .left, .right, .leftMirrored, .rightMirrored:
             context.draw(cgImage, in: CGRect(origin: .zero, size: CGSize(width: size.height, height: size.width)))
             break
@@ -167,78 +100,52 @@ extension UIImage {
             context.draw(cgImage, in: CGRect(origin: .zero, size: size))
             break
         }
+        
         guard let cgImg = context.makeImage() else {
-            return self
+            return sourceImage
         }
         return UIImage(cgImage: cgImg)
     }
     
-    public func clips(_ radius: CGFloat, corners: UIRectCorner = .allCorners) -> UIImage {
-        let w = self.size.width
-        let h = self.size.height
-        let r_ = max(0, radius)
-        let m_ = min(w, h) * 0.5
-        let r = (r_ > m_) ?m_:r_
-        let rect = CGRect(x: 0, y: 0, width: w, height: h)
+    public class func color(with color: UIColor,
+                      size: CGSize = CGSize(width: 1, height: 1),
+                      storkColor: UIColor? = nil,
+                      storkWidth: CGFloat = 0,
+                      radius: CGFloat = 0,
+                      corners: UIRectCorner = .allCorners) -> UIImage {
+        let scale = UIScreen.main.scale
+        var rawRect = CGRect(origin: .zero, size: size)
         
-        return self.draw { _ in
-            if corners == .allCorners {
-                UIBezierPath(roundedRect: rect, cornerRadius: r).addClip()
-            } else {
-                UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: r, height: r)).addClip()
+        if (storkWidth > 0) {
+            rawRect.origin.x    += storkWidth
+            rawRect.origin.y    += storkWidth
+            rawRect.size.width  -= (storkWidth * 2)
+            rawRect.size.height -= (storkWidth * 2)
+        }
+        
+        let path = UIBezierPath.init(roundedRect: rawRect,
+                                     byRoundingCorners: corners,
+                                     cornerRadii: CGSize(width: radius, height: radius))
+        
+        
+        return ImageDrawer.draw(size: size, scale: scale) { _ in
+            color.setFill()
+            if let sc = storkColor {
+                sc.setStroke()
             }
-            self.draw(in: rect)
-        }
-    }
-    
-    public func render(_ color: UIColor) -> UIImage {
-        let rect = CGRect(origin: .zero, size: self.size)
-        
-        return self.draw { context in
-            self.draw(in: rect)
-            context?.setFillColor(color.cgColor)
-            context?.setAlpha(1)
-            context?.setBlendMode(.sourceAtop)
-            context?.fill(rect)
-        }
+            
+            path.fill()
+            path.lineWidth = storkWidth
+            path.stroke()
+            } ?? UIImage()
     }
     
     
-    public func gaussianBlur(radius: CGFloat) -> UIImage {
-        do {
-            let result = try CIImage(image: self)?.gaussianBlur(radius: radius)
-            return result ?? self
-        } catch {
-            return self
-        }
-    }
-    
-    public func bitmap(size: CGSize) -> UIImage {
-        do {
-            let result = try CIImage(image: self)?.bitmap(size: size)
-            return result ?? self
-        } catch {
-            return self
-        }
-    }
-    
-    public static func qrcode(content: String, size: CGSize) throws -> UIImage? {
-        let data = content.data(using: .utf8)
-        guard let filter = CIFilter(name: "CIQRCodeGenerator") else {
-            throw NSError(domain: "Create filter failure", code: 1001, userInfo: nil)
-        }
-        
-        filter.setDefaults()
-        filter.setValue(data, forKey: "inputMessage")
-        
-        return try filter.outputImage?.bitmap(size: size)
-    }
-    
-    public static func linerGradient(colors: [UIColor],
-                                     size: CGSize,
-                                     startPoint: CGPoint? = nil,
-                                     endPoint: CGPoint? = nil) -> UIImage {
-        return UIImage.draw(size: size) { context in
+    public class func linerGradient(colors: [UIColor],
+                              size: CGSize,
+                              startPoint: CGPoint? = nil,
+                              endPoint: CGPoint? = nil) -> UIImage {
+        return ImageDrawer.draw(size: size) { context in
             context?.saveGState()
             
             let colorCount = colors.count
@@ -263,6 +170,110 @@ extension UIImage {
             context?.restoreGState()
             } ?? UIImage()
     }
+    
+    
+    public class func qrcode(with content: String, size: CGSize) throws -> UIImage? {
+        let data = content.data(using: .utf8)
+        guard let filter = CIFilter(name: "CIQRCodeGenerator") else {
+            throw NSError(domain: "Create filter failure", code: 1001, userInfo: nil)
+        }
+        
+        filter.setDefaults()
+        filter.setValue(data, forKey: "inputMessage")
+        
+        return try filter.outputImage?.bitmap(size: size)
+    }
+    
+    public func resize(_ size: CGSize) -> UIImage {
+        return ImageDrawer.draw(size: sourceImage.size) { [weak self] _ in
+            guard let `self` = self else { return }
+            self.sourceImage.draw(in: CGRect(origin: .zero, size: size))
+            } ?? sourceImage
+    }
+    
+    public func subImage(_ rect: CGRect) -> UIImage {
+        guard let imageRef: CGImage = sourceImage.cgImage?.cropping(to: rect) else {
+            return sourceImage
+        }
+        
+        return UIImage(cgImage: imageRef)
+    }
+    
+    public func add(_ image: UIImage, point: CGPoint? = nil) -> UIImage {
+        let contentSize = sourceImage.size
+        let imageSize = image.size
+        
+        if imageSize.width > contentSize.width || imageSize.height > contentSize.height {
+            return sourceImage
+        }
+        let pt = point == nil ?CGPoint(x: (contentSize.width - imageSize.width) * 0.5, y: 0):point!
+        
+        return ImageDrawer.draw { [weak self] _ in
+            guard let `self` = self else { return }
+            self.sourceImage.draw(at: .zero)
+            image.draw(at: pt)
+            } ?? sourceImage
+    }
+    
+    public func clips(_ radius: CGFloat, corners: UIRectCorner = .allCorners) -> UIImage {
+        let w = sourceImage.size.width
+        let h = sourceImage.size.height
+        let r_ = max(0, radius)
+        let m_ = min(w, h) * 0.5
+        let r = (r_ > m_) ?m_:r_
+        let rect = CGRect(x: 0, y: 0, width: w, height: h)
+        
+        return ImageDrawer.draw { [weak self] _ in
+            guard let `self` = self else { return }
+            if corners == .allCorners {
+                UIBezierPath(roundedRect: rect, cornerRadius: r).addClip()
+            } else {
+                UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: r, height: r)).addClip()
+            }
+            self.sourceImage.draw(in: rect)
+            } ?? sourceImage
+    }
+    
+    public func render(_ color: UIColor) -> UIImage {
+        let rect = CGRect(origin: .zero, size: sourceImage.size)
+        
+        return ImageDrawer.draw(opaque: true) { [weak self] context in
+            guard let `self` = self else { return }
+            context?.setBlendMode(.sourceAtop)
+            color.setFill()
+            UIRectFill(rect)
+            
+            self.sourceImage.draw(in: rect, blendMode: CGBlendMode.overlay, alpha: 1)
+            self.sourceImage.draw(in: rect, blendMode: CGBlendMode.destinationIn, alpha: 1)
+            } ?? sourceImage
+    }
+    
+}
+
+
+
+
+extension UIImage {
+    
+    
+    public func gaussianBlur(radius: CGFloat) -> UIImage {
+        do {
+            let result = try CIImage(image: self)?.gaussianBlur(radius: radius)
+            return result ?? self
+        } catch {
+            return self
+        }
+    }
+    
+    public func bitmap(size: CGSize) -> UIImage {
+        do {
+            let result = try CIImage(image: self)?.bitmap(size: size)
+            return result ?? self
+        } catch {
+            return self
+        }
+    }
+    
     
 }
 
@@ -296,20 +307,20 @@ private class CountedColor {
     }
 }
 
-extension UIImage {
+extension UIKitExt where Base: UIImage {
     public var colors: ImageColors {
         
         var result = ImageColors()
         
         // get the ratio of width to height
-        let ratio = self.size.width/self.size.height
+        let ratio = sourceImage.size.width / sourceImage.size.height
         
         // calculate new r_width and r_height
-        let r_width: CGFloat = min(self.size.width, 100)
+        let r_width: CGFloat = min(sourceImage.size.width, 100)
         let r_height: CGFloat = r_width/ratio
         
         // resize the image to the new r_width and r_height
-        let cgImage = self.resize(CGSize(width: r_width, height: r_height)).cgImage
+        let cgImage = resize(CGSize(width: r_width, height: r_height)).cgImage
         
         // get the width and height of the new image
         let width = cgImage?.width
@@ -418,6 +429,8 @@ extension UIImage {
         
         return result
     }
+    
+    
 }
 
 

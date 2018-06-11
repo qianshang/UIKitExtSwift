@@ -121,7 +121,7 @@ extension UIView {
     }
     
     fileprivate func makeSnapshot() -> UIImage? {
-        return UIImage.draw(size: self.size) {
+        return ImageDrawer.draw(size: self.size) {
             self.layer.render(in: $0!)
         }
     }
@@ -144,7 +144,11 @@ extension UIKitExt where Base: UIView {
                        offsetY: CGFloat = 3,
                        radius: CGFloat = 1,
                        opacity: Float = 1) -> UIView {
-        return self.base.makeShadow(color: color, offsetX: offsetX, offsetY: offsetY, radius: radius, opacity: opacity)
+        return self.base.makeShadow(color: color,
+                                    offsetX: offsetX,
+                                    offsetY: offsetY,
+                                    radius: radius,
+                                    opacity: opacity)
     }
     
     public func mask(with path: UIBezierPath) {

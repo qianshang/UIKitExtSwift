@@ -40,7 +40,7 @@ class ColorsCell: UITableViewCell {
     
     func createItem(with color:UIColor) -> UIView {
         let size: CGSize = CGSize(width: itemHeight, height: itemHeight)
-        let img: UIImage = UIImage.init(color: color, size: size, radius: itemHeight * 0.5)
+        let img: UIImage = UIImage.ex.color(with: color, size: size, radius: itemHeight * 0.5)
         
         let view = UIView(frame: CGRect(origin: .zero, size: CGSize(width: kScreenWidth, height: itemHeight)))
         self.contentView.addSubview(view)
