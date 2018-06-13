@@ -185,7 +185,7 @@ extension UIKitExt where Base: UIImage {
     }
     
     public func resize(_ size: CGSize) -> UIImage {
-        return ImageDrawer.draw(size: sourceImage.size) { [weak self] _ in
+        return ImageDrawer.draw(size: size) { [weak self] _ in
             guard let `self` = self else { return }
             self.sourceImage.draw(in: CGRect(origin: .zero, size: size))
             } ?? sourceImage

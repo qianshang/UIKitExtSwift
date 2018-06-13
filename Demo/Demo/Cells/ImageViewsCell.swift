@@ -12,7 +12,7 @@ fileprivate let itemWH: CGFloat = (kScreenWidth - 40 - 30) / 4
 
 class ImageViewsCell: UITableViewCell {
 
-    static let cellHeight: CGFloat = itemWH + 20
+    static let cellHeight: CGFloat = 10 + (itemWH + 10) * 2
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -48,6 +48,20 @@ class ImageViewsCell: UITableViewCell {
         let img4 = UIImage.ex.color(with: color, size: size)
         let v4 = create(img: img4)
         v4.origin = CGPoint(x: v3.maxX + 10, y: v1.y)
+        
+        
+        let scale: CGFloat = 0.25
+        let smallSize: CGSize = CGSize(width: itemWH * scale, height: itemWH * scale)
+        let smallPoint: CGPoint = CGPoint(x: itemWH * (1 - scale) * 0.5, y: itemWH * (1 - scale) * 0.5)
+        
+        let img5 = img4.ex.clips(itemWH * 0.5)
+                       .ex.add(img3!.ex.resize(smallSize), point: smallPoint)
+        let v5 = create(img: img5)
+        v5.origin = CGPoint(x: v1.x, y: v1.maxY + 10)
+        
+        let img6 = img3!.ex.add(img4.ex.resize(smallSize).ex.clips(5), point: smallPoint)
+        let v6 = create(img: img6)
+        v6.origin = CGPoint(x: v5.maxX + 10, y: v5.y)
     }
     
     func create(img: UIImage) -> UIView {
