@@ -148,4 +148,6 @@ pod 'UIKitExtSwift'
 - ✓ `UIView`的位置相关信息
 - ✓ `UIView`点击区域扩充
 - ✓ 当前设备判断
+- [ ] `UITextView`
+
 

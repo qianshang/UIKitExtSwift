@@ -249,12 +249,7 @@ extension UIKitExt where Base: UIImage {
     
 }
 
-
-
-
 extension UIImage {
-    
-    
     public func gaussianBlur(radius: CGFloat) -> UIImage {
         do {
             let result = try CIImage(image: self)?.gaussianBlur(radius: radius)

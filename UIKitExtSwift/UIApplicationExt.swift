@@ -28,6 +28,7 @@ extension UIApplication {
     
     private static let runOnce: Void = {
         swizzlingForView(UIView.self)
+        swizzlingForTextView(UITextView.self)
     }()
     
     override open var next: UIResponder? {
@@ -40,17 +41,37 @@ extension UIApplication {
 fileprivate func swizzling(for type: NSObject.Type,
                            origin originalSelector: Selector,
                            swizzled swizzledSelector: Selector) {
-    let originalMethod = class_getInstanceMethod(type, originalSelector)
-    let swizzledMethod = class_getInstanceMethod(type, swizzledSelector)
+    guard let originalMethod = class_getInstanceMethod(type, originalSelector),
+        let swizzledMethod = class_getInstanceMethod(type, swizzledSelector) else {
+            return
+    }
     
-    method_exchangeImplementations(originalMethod!, swizzledMethod!)
+    if class_addMethod(type,
+                       originalSelector,
+                       method_getImplementation(swizzledMethod),
+                       method_getTypeEncoding(swizzledMethod)) {
+        class_replaceMethod(type,
+                            originalSelector,
+                            method_getImplementation(swizzledMethod),
+                            method_getTypeEncoding(swizzledMethod))
+    } else {
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }
 }
 
 // UIView
-private let swizzlingForView: (UIView.Type)->() = { view in
+private let swizzlingForView: (UIView.Type) -> () = { view in
     let originalSelector = #selector(view.point(inside:with:))
     let swizzledSelector = #selector(view.uk_point(inside:with:))
     
     swizzling(for: view, origin: originalSelector, swizzled: swizzledSelector)
+}
+
+// UITextView
+private let swizzlingForTextView: (UITextView.Type) -> () = { view in
+    let originSelector = #selector(view.layoutSubviews)
+    let swizzledSelector = #selector(view.uk_layoutSubviews)
+    
+    swizzling(for: view, origin: originSelector, swizzled: swizzledSelector)
 }
 

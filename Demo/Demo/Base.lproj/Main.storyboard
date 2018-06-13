@@ -17,14 +17,30 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="zW4-GW-g2E">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="zW4-GW-g2E" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="1q0-mM-xGa"/>
+                            <constraint firstItem="zW4-GW-g2E" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ASk-hn-IUq"/>
+                            <constraint firstItem="zW4-GW-g2E" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Aqv-o7-hNj"/>
+                            <constraint firstItem="zW4-GW-g2E" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="RXT-G5-Zne"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" title="UIKitExtSwift" id="nr8-85-R9i"/>
+                    <connections>
+                        <outlet property="bottomConstraint" destination="RXT-G5-Zne" id="bXr-0m-3CU"/>
+                        <outlet property="tableView" destination="zW4-GW-g2E" id="znb-yh-86g"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1042" y="793"/>
+            <point key="canvasLocation" x="1040.8" y="792.95352323838085"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Thl-0o-hJp">

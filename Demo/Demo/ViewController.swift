@@ -15,11 +15,32 @@ let kScreenHeight: CGFloat = UIScreen.main.bounds.height
 
 class ViewController: UIViewController {
 
-    private let kColorsCellResuseId: String     = "ColorsCell"
-    private let kImageViewsCellResuseId: String = "ImageViewsCell"
-    private let kButtonsCellResuseId: String    = "ButtonsCell"
-    private let kViewsCellResuseId: String      = "ViewsCell"
-    private var tableView: UITableView = UITableView(frame: .zero, style: .grouped)
+    struct CellType {
+        let type: UITableViewCell.Type
+        let title: String
+        let reuseId: String
+        let cellHeight: CGFloat
+        
+        init(_ cellType: UITableViewCell.Type, _ sectionTitle: String, _ id: String, _ height: CGFloat = 44) {
+            type = cellType
+            title = sectionTitle
+            reuseId = id
+            cellHeight = height
+        }
+    }
+    
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    
+    private var cells: [CellType] {
+        var arr: [CellType] = []
+        arr.append(CellType(ColorsCell.self,     "颜色",  "ColorsCell",     ColorsCell.cellHeight))
+        arr.append(CellType(ImageViewsCell.self, "图片",  "ImageViewsCell", ImageViewsCell.cellHeight))
+        arr.append(CellType(ButtonsCell.self,    "按钮",  "ButtonsCell",    ButtonsCell.cellHeight))
+        arr.append(CellType(ViewCell.self,       "试图",  "ViewsCell",      ViewCell.cellHeight))
+        arr.append(CellType(TextViewCell.self,   "文本框", "TextViewCell",   TextViewCell.cellHeight))
+        return arr
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,20 +51,18 @@ class ViewController: UIViewController {
             print("iPhoneX")
         }
         
-//        tableView.backgroundView = UIImageView(image: UIImage.ex.color(with: .green))
+        tableView.backgroundView = UIImageView(image: UIImage.ex.color(with: 0xF0F0F0.ex.color))
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDismiss), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
     func setupUI() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        tableView.register(ColorsCell.self, forCellReuseIdentifier: kColorsCellResuseId)
-        tableView.register(ImageViewsCell.self, forCellReuseIdentifier: kImageViewsCellResuseId)
-        tableView.register(ButtonsCell.self, forCellReuseIdentifier: kButtonsCellResuseId)
-        tableView.register(ViewCell.self, forCellReuseIdentifier: kViewsCellResuseId)
-        self.view.addSubview(tableView)
-        tableView.frame = self.view.bounds
+        cells.forEach { item in
+            tableView.register(item.type, forCellReuseIdentifier: item.reuseId)
+        }
         tableView.contentInset = UIEdgeInsetsMake(30, 0, 0, 0)
-        
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -63,93 +82,44 @@ class ViewController: UIViewController {
         self.showDetailViewController(activity, sender: nil)
     }
     
+    @objc func keyboardWillShow(_ note: Notification) {
+        guard let frame = note.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else { return }
+        
+        bottomConstraint.constant = -frame.height
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: self.cells.count-1), at: .top, animated: true)
+        }
+    }
+    @objc func keyboardWillDismiss() {
+        bottomConstraint.constant = 0
+    }
 }
 
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return cells.count
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = cellForRow(at: indexPath) else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cells[indexPath.section].reuseId) else {
             return tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         }
         return cell
     }
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return titleForHeader(in: section)
+        return cells[section].title
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return heightForRow(at: indexPath)
+        return cells[indexPath.section].cellHeight
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 20
     }
-    
-    func titleForHeader(in section: Int) -> String? {
-        switch section {
-        case 0:
-            return "颜色"
-        case 1:
-            return "图片"
-        case 2:
-            return "按钮"
-        case 3:
-            return "视图"
-        default:
-            return nil
-        }
-    }
-    func heightForRow(at indexPath: IndexPath) -> CGFloat {
-        switch (indexPath.section, indexPath.row) {
-        case (0, _):
-            return ColorsCell.cellHeight
-        case (1, _):
-            return ImageViewsCell.cellHeight
-        case (2, _):
-            return ButtonsCell.cellHeight
-        case (3, _):
-            return ViewCell.cellHeight
-        default:
-            return 0
-        }
-    }
-    func cellForRow(at indexPath: IndexPath) -> UITableViewCell? {
-        switch (indexPath.section, indexPath.row) {
-        case (0, let row):
-            return colorsCell(in: row)
-        case (1, let row):
-            return imageViewCell(in: row)
-        case (2, let row):
-            return buttonCell(in: row)
-        case (3, let row):
-            return viewCell(in: row)
-        default:
-            return nil
-        }
-    }
-    func colorsCell(in row: Int) -> UITableViewCell? {
-        let cell = tableView.dequeueReusableCell(withIdentifier: kColorsCellResuseId)
-        
-        return cell
-    }
-    func imageViewCell(in row: Int) -> UITableViewCell? {
-        let cell = tableView.dequeueReusableCell(withIdentifier: kImageViewsCellResuseId)
-        
-        return cell
-    }
-    func buttonCell(in row: Int) -> UITableViewCell? {
-        let cell = tableView.dequeueReusableCell(withIdentifier: kButtonsCellResuseId)
-        
-        return cell
-    }
-    func viewCell(in row: Int) -> UITableViewCell? {
-        let cell = tableView.dequeueReusableCell(withIdentifier: kViewsCellResuseId)
-        
-        return cell
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        view.endEditing(true)
     }
 }
 
