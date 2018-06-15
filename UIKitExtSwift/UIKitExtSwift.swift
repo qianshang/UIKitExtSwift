@@ -34,9 +34,11 @@ extension UIColor: UIKitExtCompatible {}
 extension UIImage: UIKitExtCompatible {
     public typealias ex = UIKitExt<UIImage>
 }
+
 extension UIView: UIKitExtCompatible {}
 extension UIApplication: UIKitExtCompatible {}
 extension UIDevice: UIKitExtCompatible {}
+
 
 /**:
  # 在extension中添加property

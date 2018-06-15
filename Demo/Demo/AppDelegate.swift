@@ -16,6 +16,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        struct Node {
+            let tier: Int
+            let title: String
+            var subNode: [Node]?
+            
+            init(_ tile: Int, _ title: String, _ subNode: [Node]? = nil) {
+                self.tier = tile
+                self.title = title
+                self.subNode = subNode
+            }
+            
+            mutating func addNode(_ node: Node) {
+                if subNode == nil {
+                    subNode = []
+                }
+                subNode?.append(node)
+            }
+        }
+        
+        func showAllNode(with node: Node, tiler: Int = 0) {
+            print("\(tiler) :", node.title, node.tier)
+            
+            guard let sub = node.subNode, !sub.isEmpty else {
+                return
+            }
+            sub.forEach {
+                showAllNode(with: $0, tiler: tiler + 1)
+            }
+        }
+        
+        var rootNode = Node(0, "root")
+        rootNode.addNode(Node(1, "first"))
+        rootNode.addNode(Node(1, "second", [Node(2, "other")]))
+        rootNode.addNode(Node(1, "third"))
+        
+        showAllNode(with: rootNode)
+        
         return true
     }
 
