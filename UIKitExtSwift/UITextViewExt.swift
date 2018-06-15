@@ -49,7 +49,7 @@ extension UIKitExt where Base: UITextView {
             textView.font = UIFont.systemFont(ofSize: 14)
         }
         placeholderView.font = textView.font
-        print(textView)
+        
         let left   = textView.textContainerInset.left + 4
         let top    = textView.textContainerInset.top
         let right  = textView.textContainerInset.right + 4
