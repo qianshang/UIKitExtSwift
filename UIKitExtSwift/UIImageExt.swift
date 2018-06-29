@@ -191,6 +191,19 @@ extension UIKitExt where Base: UIImage {
             } ?? sourceImage
     }
     
+    public func resizeIO(_ size: CGSize) -> UIImage {
+        guard let data = UIImagePNGRepresentation(sourceImage),
+            let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {
+            return sourceImage
+        }
+        let maxPixelSize = max(size.width, size.height)
+        let options: [NSString: Any] = [kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+                                        kCGImageSourceCreateThumbnailFromImageAlways: true]
+        let resizeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, options as CFDictionary)
+            .flatMap { UIImage(cgImage: $0) }
+        return resizeImage ?? sourceImage
+    }
+    
     public func subImage(_ rect: CGRect) -> UIImage {
         guard let imageRef: CGImage = sourceImage.cgImage?.cropping(to: rect) else {
             return sourceImage
