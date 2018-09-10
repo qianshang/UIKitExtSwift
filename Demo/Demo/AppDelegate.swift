@@ -35,14 +35,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
-        func showAllNode(with node: Node, tiler: Int = 0) {
-            print("\(tiler) :", node.title, node.tier)
+        func showAllNode(with node: Node, tier: Int = 0) {
+            print("\(tier) :", node.title, node.tier)
             
             guard let sub = node.subNode, !sub.isEmpty else {
                 return
             }
             sub.forEach {
-                showAllNode(with: $0, tiler: tiler + 1)
+                showAllNode(with: $0, tier: tier + 1)
             }
         }
         
@@ -52,6 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootNode.addNode(Node(1, "third"))
         
         showAllNode(with: rootNode)
+        
         
         return true
     }

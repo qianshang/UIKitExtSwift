@@ -63,16 +63,81 @@ class ImageViewsCell: UITableViewCell {
             let col = CGFloat( index % rowCount )
             let row = CGFloat( index / rowCount )
             
-            addImageView(with: img, at: CGPoint(x: 20 + col * (itemWH + padding), y: padding + row * (itemWH + padding)))
+            let imageView = addImageView(with: img, at: CGPoint(x: 20 + col * (itemWH + padding), y: padding + row * (itemWH + padding)))
+            if index == 3 {
+                imageView.addGradientMask(colors: [.red, .orange, .cyan])
+            }
         }
     }
     
-    func addImageView(with image: UIImage, at point: CGPoint) {
+    @discardableResult
+    func addImageView(with image: UIImage, at point: CGPoint) -> UIImageView {
         let imageView = UIImageView(image: image)
         imageView.isCouldPreview = true
         imageView.groupId = 0
         imageView.ex.touchEdgeInsets = UIEdgeInsetsMake(-20, -20, -20, -20)
         self.contentView.addSubview(imageView)
         imageView.origin = point
+        
+        return imageView
     }
 }
+
+extension UIImageView {
+    func addGradientMask(colors: [UIColor]? = nil,
+                         startPoint: CGPoint = CGPoint(x: 0, y: 0),
+                         endPoint: CGPoint = CGPoint(x: 0, y: 1)
+        ) {
+        let gradientLayer = CAGradientLayer()
+        
+        gradientLayer.colors = colors?.map { $0.cgColor }
+        gradientLayer.startPoint = startPoint
+        gradientLayer.endPoint = endPoint
+        
+        self.layer.addSublayer(gradientLayer)
+        gradientLayer.frame = bounds
+        
+        let maskLayer = CALayer()
+        self.layer.insertSublayer(maskLayer, at: 0)
+        
+        maskLayer.frame = bounds
+        let img = genQRCodeImageMask(grayScaleQRCodeImage: image)
+        maskLayer.contents = img
+        
+        gradientLayer.mask = maskLayer
+    }
+}
+
+func genQRCodeImageMask(grayScaleQRCodeImage: UIImage?) -> CGImage? {
+    if let image = grayScaleQRCodeImage {
+        let bitsPerComponent = 8
+        let bytesPerPixel = 4
+        let width:Int = Int(image.size.width)
+        let height:Int = Int(image.size.height)
+        let imageData = UnsafeMutableRawPointer.allocate(byteCount: Int(width * height * bytesPerPixel), alignment: 8)
+        
+        // 将原始黑白二维码图片绘制到像素格式为ARGB的图片上，绘制后的像素数据在imageData中。
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let imageContext = CGContext.init(data: imageData, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: bitsPerComponent, bytesPerRow: width * bytesPerPixel, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue )
+        UIGraphicsPushContext(imageContext!)
+        imageContext?.translateBy(x: 0, y: CGFloat(height))
+        imageContext?.scaleBy(x: 1, y: -1)
+        image.draw(in: CGRect.init(x: 0, y: 0, width: width, height: height))
+        UIGraphicsPopContext()
+        
+        // 根据每个像素R通道的值修改Alpha通道的值，当Red大于100，则将Alpha置为0，反之置为255
+        for row in 0..<height {
+            for col in 0..<width {
+                let offset = row * width * bytesPerPixel + col * bytesPerPixel
+                let r = imageData.load(fromByteOffset: offset + 1, as: UInt8.self)
+                let alpha:UInt8 = r > 100 ? 0 : 255
+                imageData.storeBytes(of: alpha, toByteOffset: offset, as: UInt8.self)
+            }
+        }
+        
+        return imageContext?.makeImage()
+    }
+    return nil
+}
+
+
