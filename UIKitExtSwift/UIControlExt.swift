@@ -13,7 +13,7 @@ final class ControlTarget: NSObject {
     typealias Callback = (UIControl) -> Void
     
     fileprivate weak var control: UIControl?
-    fileprivate var eventsHandler: [UIControlEvents.RawValue: Callback] = [:]
+    fileprivate var eventsHandler: [UIControl.Event.RawValue: Callback] = [:]
     
     init(_ control: UIControl) {
         super.init()
@@ -22,7 +22,7 @@ final class ControlTarget: NSObject {
         addSupport()
     }
     
-    func addEvents(for events: UIControlEvents, handler: @escaping Callback) {
+    func addEvents(for events: UIControl.Event, handler: @escaping Callback) {
         eventsHandler[events.rawValue] = handler
     }
     
@@ -94,14 +94,14 @@ final class ControlTarget: NSObject {
     }
     
     
-    func eventHandler(for event: UIControlEvents) {
+    func eventHandler(for event: UIControl.Event) {
         guard let control = control else { return }
         eventsHandler[event.rawValue]?(control)
     }
 }
 
 extension UIKitExt where Base: UIControl {
-    private func addEvents(for events: UIControlEvents, handler: @escaping (UIControl) -> Void) {
+    private func addEvents(for events: UIControl.Event, handler: @escaping (UIControl) -> Void) {
         self.base.eventsTarget.addEvents(for: events, handler: handler)
     }
     

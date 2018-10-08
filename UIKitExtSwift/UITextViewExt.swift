@@ -60,7 +60,7 @@ extension UIKitExt where Base: UITextView {
         let w = textView.width - left - right
         let h = (text as NSString).boundingRect(with: CGSize(width: w, height: textView.height - top - bottom),
                                                 options: NSStringDrawingOptions.usesLineFragmentOrigin,
-                                                attributes: [NSAttributedStringKey.font : placeholderView.font],
+                                                attributes: [NSAttributedString.Key.font : placeholderView.font],
                                                 context: nil).height
         
         placeholderView.frame = CGRect(x: x, y: y, width: w, height: h)
@@ -103,7 +103,7 @@ class TextViewObserver: NSObject {
         NotificationCenter.default
             .addObserver(self,
                          selector: #selector(textValueChanged),
-                         name: NSNotification.Name.UITextViewTextDidChange,
+                         name: UITextView.textDidChangeNotification,
                          object: nil)
         isListening = true
     }
@@ -116,7 +116,7 @@ class TextViewObserver: NSObject {
         isListening = false
         NotificationCenter.default
             .removeObserver(self,
-                            name: NSNotification.Name.UITextViewTextDidChange,
+                            name: UITextView.textDidChangeNotification,
                             object: nil)
     }
 }

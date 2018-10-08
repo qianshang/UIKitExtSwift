@@ -16,7 +16,7 @@ class ImageViewsCell: UITableViewCell {
 
     static let cellHeight: CGFloat = padding + (itemWH + padding) * 2
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setupUI()
@@ -75,7 +75,7 @@ class ImageViewsCell: UITableViewCell {
         let imageView = UIImageView(image: image)
         imageView.isCouldPreview = true
         imageView.groupId = 0
-        imageView.ex.touchEdgeInsets = UIEdgeInsetsMake(-20, -20, -20, -20)
+        imageView.ex.touchEdgeInsets = UIEdgeInsets.init(top: -20, left: -20, bottom: -20, right: -20)
         self.contentView.addSubview(imageView)
         imageView.origin = point
         

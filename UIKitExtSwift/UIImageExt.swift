@@ -192,7 +192,7 @@ extension UIKitExt where Base: UIImage {
     }
     
     public func resizeIO(_ size: CGSize) -> UIImage {
-        guard let data = UIImagePNGRepresentation(sourceImage),
+        guard let data = sourceImage.pngData(),
             let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else {
             return sourceImage
         }

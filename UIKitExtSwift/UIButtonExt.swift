@@ -61,7 +61,7 @@ extension UIButton {
             else { return }
         
         let labelString = NSString(string: text)
-        let titleSize = labelString.size(withAttributes: [NSAttributedStringKey.font: font])
+        let titleSize = labelString.size(withAttributes: [NSAttributedString.Key.font: font])
         let edgeOffset = abs(titleSize.height - imageSize.height) / 2.0
         
         reset(titleSize, imageSize)
@@ -71,14 +71,14 @@ extension UIButton {
     func setImageDirection(_ diretion: ImageDirection) {
         switch diretion {
         case .left(distance: let distance):
-            self.titleEdgeInsets = UIEdgeInsetsMake(0, distance * 0.5, 0, -distance * 0.5)
-            self.imageEdgeInsets = UIEdgeInsetsMake(0, -distance * 0.5, 0, distance * 0.5)
+            self.titleEdgeInsets = UIEdgeInsets(top: 0, left: distance * 0.5, bottom: 0, right: -distance * 0.5)
+            self.imageEdgeInsets = UIEdgeInsets(top: 0, left: -distance * 0.5, bottom: 0, right: distance * 0.5)
             
             self.imageDirection = 0
             self.imageDistance = distance
         case .right(distance: let distance):
-            self.titleEdgeInsets = UIEdgeInsetsMake(0, -distance * 0.5, 0, distance * 0.5)
-            self.imageEdgeInsets = UIEdgeInsetsMake(0, distance * 0.5, 0, -distance * 0.5)
+            self.titleEdgeInsets = UIEdgeInsets(top: 0, left: -distance * 0.5, bottom: 0, right: distance * 0.5)
+            self.imageEdgeInsets = UIEdgeInsets(top: 0, left: distance * 0.5, bottom: 0, right: -distance * 0.5)
             
             if #available(iOS 9.0, *) {
                 self.semanticContentAttribute = .forceRightToLeft

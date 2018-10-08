@@ -53,8 +53,8 @@ class ViewController: UIViewController {
         
         tableView.backgroundView = UIImageView(image: UIImage.ex.color(with: 0xF0F0F0.ex.color))
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDismiss), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDismiss), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     func setupUI() {
@@ -62,7 +62,7 @@ class ViewController: UIViewController {
         cells.forEach { item in
             tableView.register(item.type, forCellReuseIdentifier: item.reuseId)
         }
-        tableView.contentInset = UIEdgeInsetsMake(30, 0, 0, 0)
+        tableView.contentInset = UIEdgeInsets.init(top: 30, left: 0, bottom: 0, right: 0)
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -83,7 +83,7 @@ class ViewController: UIViewController {
     }
     
     @objc func keyboardWillShow(_ note: Notification) {
-        guard let frame = note.userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect else { return }
+        guard let frame = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
         bottomConstraint.constant = -frame.height
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -127,7 +127,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 extension String {
     public func contentHeight(maxWidth: CGFloat, font: UIFont) -> CGFloat {
         let size: CGSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
-        let attribute = [NSAttributedStringKey.font: font]
+        let attribute = [NSAttributedString.Key.font: font]
         return (self as NSString).boundingRect(with: size,
                                                options: [.usesLineFragmentOrigin],
                                                attributes: attribute,
@@ -135,7 +135,7 @@ extension String {
     }
     public func contentWidth(maxHeight: CGFloat, font: UIFont) -> CGFloat {
         let size: CGSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: maxHeight)
-        let attribute = [NSAttributedStringKey.font: font]
+        let attribute = [NSAttributedString.Key.font: font]
         return (self as NSString).boundingRect(with: size,
                                                options: [.usesLineFragmentOrigin],
                                                attributes: attribute,
@@ -143,7 +143,7 @@ extension String {
     }
     public func contentSize(maxWidth: CGFloat, font: UIFont) -> CGSize {
         let size: CGSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
-        let attribute = [NSAttributedStringKey.font: font]
+        let attribute = [NSAttributedString.Key.font: font]
         return (self as NSString).boundingRect(with: size,
                                                options: [.usesLineFragmentOrigin],
                                                attributes: attribute,

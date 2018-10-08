@@ -174,7 +174,8 @@ extension UIView {
     @objc func uk_point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let inset = self.touchAreaInset
         let bounds = self.bounds
-        let hitBounds = UIEdgeInsetsInsetRect(bounds, inset)
+        let hitBounds = bounds.inset(by: inset)
+        
         return hitBounds.contains(point)
     }
 }
