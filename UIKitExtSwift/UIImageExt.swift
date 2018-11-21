@@ -247,16 +247,21 @@ extension UIKitExt where Base: UIImage {
             } ?? sourceImage
     }
     
-    public func render(_ color: UIColor) -> UIImage {
+    public func render(_ color: UIColor, blendMode: CGBlendMode = .destinationIn) -> UIImage {
         let rect = CGRect(origin: .zero, size: sourceImage.size)
         
-        return ImageDrawer.draw(size: sourceImage.size, opaque: true) { [weak self] context in
+        return ImageDrawer.draw(size: sourceImage.size, opaque: false, scale: 0) { [weak self] context in
             guard let `self` = self else { return }
-            self.sourceImage.draw(in: rect)
+            
             context?.setFillColor(color.cgColor)
-            context?.setAlpha(1)
-            context?.setBlendMode(.sourceAtop)
             context?.fill(rect)
+            
+            self.sourceImage.draw(in: rect, blendMode: blendMode, alpha: 1)
+            if blendMode != .destinationIn {
+                self.sourceImage.draw(in: rect, blendMode: .destinationIn, alpha: 1)
+            }
+            
+            context?.setBlendMode(.sourceAtop)
             } ?? sourceImage
     }
     
