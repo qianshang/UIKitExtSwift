@@ -45,6 +45,9 @@ extension UIKitExt where Base: UITextView {
         guard let text = placeholderView.text, !text.isEmpty else {
             return
         }
+        
+        textChanged()
+        
         if textView.font == nil {
             textView.font = UIFont.systemFont(ofSize: 14)
         }
@@ -82,8 +85,6 @@ extension UIKitExt where Base: UITextView {
     }
     
     func textChanged() {
-        guard textView.isFirstResponder else { return }
-        
         placeholderView.isHidden = !textView.text.isEmpty
     }
 }
