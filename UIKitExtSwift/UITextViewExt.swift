@@ -63,7 +63,7 @@ extension UIKitExt where Base: UITextView {
         let w = textView.width - left - right
         let h = (text as NSString).boundingRect(with: CGSize(width: w, height: textView.height - top - bottom),
                                                 options: NSStringDrawingOptions.usesLineFragmentOrigin,
-                                                attributes: [NSAttributedString.Key.font : placeholderView.font],
+                                                attributes: [NSAttributedString.Key.font : placeholderView.font!],
                                                 context: nil).height
         
         placeholderView.frame = CGRect(x: x, y: y, width: w, height: h)

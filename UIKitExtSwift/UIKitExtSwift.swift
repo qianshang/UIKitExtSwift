@@ -22,7 +22,7 @@ public protocol UIKitExtCompatible {
 }
 
 public extension UIKitExtCompatible {
-    public var ex: UIKitExt<Self> {
+    var ex: UIKitExt<Self> {
         get { return UIKitExt(self) }
     }
 }
