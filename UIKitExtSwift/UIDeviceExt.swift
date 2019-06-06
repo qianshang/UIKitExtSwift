@@ -7,6 +7,8 @@
 
 import Foundation
 
+// [deviceModel](https://www.theiphonewiki.com/wiki/Models)
+
 public enum DeviceType {
     case Simulator
     
@@ -56,6 +58,7 @@ public enum DeviceType {
     case iPadMini2
     case iPadMini3
     case iPadMini4
+    case iPadMini5
     
     case unKnown
 }
@@ -177,6 +180,8 @@ fileprivate func getDeviceType(with identifier: String) -> DeviceType {
         return .iPadMini3
     case "iPad5,1", "iPad5,2":
         return .iPadMini4
+    case "iPad11,1", "iPad11,2":
+        return .iPadMini5
         
     default :
         return .unKnown
