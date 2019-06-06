@@ -8,14 +8,14 @@
 import Foundation
 
 
-final class ControlTarget: NSObject {
+final class ControlTarget<T: UIControl>: NSObject {
     
-    typealias Callback = (UIControl) -> Void
+    typealias Callback = (T) -> Void
     
-    fileprivate weak var control: UIControl?
+    fileprivate weak var control: T?
     fileprivate var eventsHandler: [UIControl.Event.RawValue: Callback] = [:]
     
-    init(_ control: UIControl) {
+    init(_ control: T) {
         super.init()
         self.control = control
         
@@ -100,9 +100,23 @@ final class ControlTarget: NSObject {
     }
 }
 
+private struct _Associated {
+    static var key: String = "EventsTarget"
+}
 extension UIKitExt where Base: UIControl {
+    private var eventsTarget: ControlTarget<Base> {
+        get {
+            if let mg = objc_getAssociatedObject(base, &_Associated.key) as? ControlTarget<Base> {
+                return mg
+            }
+            let mg = ControlTarget<Base>(base)
+            objc_setAssociatedObject(base, &_Associated.key, mg, .OBJC_ASSOCIATION_RETAIN)
+            return mg
+        }
+    }
+    
     private func addEvents(for events: UIControl.Event, handler: @escaping (UIControl) -> Void) {
-        self.base.eventsTarget.addEvents(for: events, handler: handler)
+        eventsTarget.addEvents(for: events, handler: handler)
     }
     
     public func touchDown(_ handler: @escaping (UIControl) -> Void) {
@@ -137,21 +151,5 @@ extension UIKitExt where Base: UIControl {
     }
     public func allEvents(_ handler: @escaping (UIControl) -> Void) {
         addEvents(for: .allEvents, handler: handler)
-    }
-}
-
-extension UIControl {
-    fileprivate static let eventsTarget__ = ObjectAssociation<ControlTarget>()
-    fileprivate var eventsTarget: ControlTarget {
-        get {
-            if let target = UIControl.eventsTarget__[self] {
-                return target
-            } else {
-                let target = ControlTarget(self)
-                UIControl.eventsTarget__[self] = target
-                return target
-            }
-        }
-        set { UIControl.eventsTarget__[self] = newValue }
     }
 }

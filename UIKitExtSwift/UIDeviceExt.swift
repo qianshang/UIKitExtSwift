@@ -28,6 +28,9 @@ public enum DeviceType {
     case iPhone8
     case iPhone8P
     case iPhoneX
+    case iPhoneXr
+    case iPhoneXs
+    case iPhoneXsMax
     
     case iPod
     case iPod2
@@ -67,6 +70,15 @@ extension UIKitExt where Base: UIDevice {
             return id + String(UnicodeScalar(UInt8(value)))
         }
         return getDeviceType(with: identifier)
+    }
+    
+    public var isX: Bool {
+        switch deviceType {
+        case .iPhoneX, .iPhoneXr, .iPhoneXs, .iPhoneXsMax:
+            return true
+        default:
+            return false
+        }
     }
 }
 
@@ -112,6 +124,12 @@ fileprivate func getDeviceType(with identifier: String) -> DeviceType {
         return .iPhone8P
     case "iPhone10,3", "iPhone10,6":
         return .iPhoneX
+    case "iPhone11,8":
+        return .iPhoneXr
+    case "iPhone11,2":
+        return .iPhoneXs
+    case "iPhone11,6":
+        return .iPhoneXsMax
         
     case "iPod1,1":
         return .iPod
