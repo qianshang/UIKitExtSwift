@@ -11,13 +11,15 @@ extension UIKitExt where Base: UIApplication {
     public var currentViewController: UIViewController? {
         var vc: UIViewController? = self.base.keyWindow?.rootViewController
         
-        while let v = vc?.presentedViewController, v != vc {
-            if (v.isKind(of: UINavigationController.self)) {
-                vc = (v as! UINavigationController).visibleViewController
-            } else if (v.isKind(of: UITabBarController.self)) {
-                vc = (v as! UITabBarController).selectedViewController
+        while let v = vc {
+            if let nav = v as? UINavigationController {
+                vc = nav.visibleViewController
+            } else if let tab = v as? UITabBarController {
+                vc = tab.selectedViewController
+            } else if let vv = v.presentedViewController {
+                vc = vv
             } else {
-                vc = v
+                break
             }
         }
         
